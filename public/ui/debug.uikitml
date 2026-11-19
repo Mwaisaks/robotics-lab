@@ -1,0 +1,26 @@
+<!--
+  Debug readout: only shown with ?debug=1 (DebugSystem hides it otherwise).
+  Plain divs keep these colors in both color schemes.
+-->
+<style>
+  .debug {
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 14px;
+    padding-right: 14px;
+    border-radius: 12px;
+    background-color: #111317;
+  }
+
+  .line {
+    color: #7cf29c;
+    font-size: 22px;
+    font-weight: 700;
+  }
+</style>
+<div class="debug">
+  <span id="fps" class="line">FPS --</span>
+  <span id="build" class="line">build --</span>
+</div>

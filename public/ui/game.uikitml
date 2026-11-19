@@ -1,0 +1,563 @@
+<!--
+  Game panel: three views (start, play, result) toggled by GameSystem via
+  setProperties({ display }). Text classes have a dark color plus a light
+  :dark variant because the Horizon Panel surface follows the color scheme.
+-->
+<style>
+  .panel-root {
+    flex-direction: column;
+    width: 440px;
+  }
+
+  .view {
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 22px;
+    padding-bottom: 22px;
+    padding-left: 26px;
+    padding-right: 26px;
+  }
+
+  .eyebrow {
+    color: #6b5a00;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+  }
+
+  .eyebrow:dark {
+    color: #f5d90a;
+  }
+
+  .heading {
+    color: #1c1d20;
+    font-size: 36px;
+    font-weight: 700;
+  }
+
+  .heading:dark {
+    color: #fafaf7;
+  }
+
+  .body {
+    color: #3a3b40;
+    font-size: 24px;
+  }
+
+  .body:dark {
+    color: #dddfe3;
+  }
+
+  .stats {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .stat {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-label {
+    color: #3a3b40;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+  }
+
+  .stat-label:dark {
+    color: #b8bac0;
+  }
+
+  .stat-value {
+    color: #1c1d20;
+    font-size: 64px;
+    font-weight: 700;
+  }
+
+  .stat-value:dark {
+    color: #fafaf7;
+  }
+
+  .feedback {
+    color: #1c1d20;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .feedback:dark {
+    color: #fafaf7;
+  }
+
+  .button {
+    margin-top: 10px;
+    height: 110px;
+    justify-content: center;
+  }
+
+  .button-label {
+    font-size: 46px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
+
+  .button-small {
+    margin-top: 6px;
+    height: 72px;
+    justify-content: center;
+  }
+
+  .button-small-label {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .tut-step-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .tut-icon {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    color: #f5c542;
+  }
+
+  .tut-text {
+    color: #1c1d20;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+  .tut-text:dark {
+    color: #fafaf7;
+  }
+
+  .tut-sub {
+    color: #3a3b40;
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .tut-sub:dark {
+    color: #b8bac0;
+  }
+
+  .level-button {
+    margin-top: 4px;
+    width: 100%;
+    height: 84px;
+    justify-content: center;
+  }
+
+  .level-label {
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  .tick {
+    color: #1f9d55;
+  }
+
+  .row-buttons {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .grow {
+    flex-grow: 1;
+  }
+
+  .prog-head {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .prog-col {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .prog-instr {
+    color: #1c1d20;
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  .prog-instr:dark {
+    color: #fafaf7;
+  }
+
+  .slots {
+    flex-direction: row;
+    gap: 5px;
+  }
+
+  .slot {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border-width: 3px;
+    border-color: #3a3d45;
+    background-color: #2b2e35;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slot-icon {
+    width: 28px;
+    height: 28px;
+    color: #ffffff;
+  }
+
+  .cmd {
+    height: 62px;
+    justify-content: center;
+  }
+
+  .cmd-label {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .button-tiny {
+    height: 48px;
+  }
+
+  .button-tiny-label {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .step-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    color: #f5c542;
+  }
+
+  .step-text {
+    color: #1c1d20;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .step-text:dark {
+    color: #fafaf7;
+  }
+
+  .stars {
+    flex-direction: row;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  .star {
+    width: 64px;
+    height: 64px;
+    color: #f5c542;
+  }
+</style>
+<Panel class="panel-root">
+  <div id="menu-view" class="view">
+    <div class="eyebrow">ROBOT ARM LAB</div>
+    <div class="heading">Choose a level</div>
+    <Button id="level1-button" class="level-button">
+      <ButtonLabel class="level-label">1  SORT PARTS</ButtonLabel>
+      <ButtonIcon><Check id="tick-1" class="tick" style="display: none"></Check></ButtonIcon>
+    </Button>
+    <Button id="level2-button" class="level-button">
+      <ButtonLabel class="level-label">2  PROGRAM ROBOT</ButtonLabel>
+      <ButtonIcon><Check id="tick-2" class="tick" style="display: none"></Check></ButtonIcon>
+    </Button>
+    <Button id="level3-button" class="level-button">
+      <ButtonLabel class="level-label">3  LIGHT IT UP</ButtonLabel>
+      <ButtonIcon><Check id="tick-3" class="tick" style="display: none"></Check></ButtonIcon>
+    </Button>
+    <Button id="exit-button-menu" class="button-small" variant="secondary">
+      <ButtonLabel class="button-small-label">EXIT</ButtonLabel>
+    </Button>
+  </div>
+  <div id="start-view" class="view" style="display: none">
+    <div class="eyebrow">ROBOT ARM LAB</div>
+    <div class="heading">Sort the parts</div>
+    <div class="body">Pinch a part. Drop it on its color.</div>
+    <Button id="start-button" class="button">
+      <ButtonLabel class="button-label">START</ButtonLabel>
+    </Button>
+    <Button id="howto-button" class="button-small">
+      <ButtonLabel class="button-small-label">HOW TO PLAY</ButtonLabel>
+    </Button>
+    <Button id="menu-button-start" class="button-small" variant="secondary">
+      <ButtonLabel class="button-small-label">MENU</ButtonLabel>
+    </Button>
+  </div>
+  <div id="tutorial-view" class="view" style="display: none">
+    <div class="eyebrow">HOW TO PLAY</div>
+    <div class="tut-step-row">
+      <Hand class="tut-icon"></Hand>
+      <div class="tut-text">Hold up your hands</div>
+    </div>
+    <div class="tut-step-row">
+      <Grab class="tut-icon"></Grab>
+      <div class="tut-text">Touch a part, then pinch</div>
+    </div>
+    <div class="tut-step-row">
+      <Target class="tut-icon"></Target>
+      <div class="tut-text">Drop it on its colour</div>
+    </div>
+    <div class="tut-sub">Point, then pinch to press</div>
+    <Button id="skip-button" class="button">
+      <ButtonLabel class="button-label">PLAY</ButtonLabel>
+    </Button>
+  </div>
+  <div id="play-view" class="view" style="display: none">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">TIME</div>
+        <div id="time-value" class="stat-value">60</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">SCORE</div>
+        <div id="score-value" class="stat-value">0</div>
+      </div>
+    </div>
+    <div id="feedback" class="feedback">Go!</div>
+    <Button id="menu-button-play" class="button-small" variant="secondary">
+      <ButtonLabel class="button-small-label">STOP + MENU</ButtonLabel>
+    </Button>
+  </div>
+  <div id="result-view" class="view" style="display: none">
+    <div class="stars">
+      <Star id="star-1" class="star"></Star>
+      <Star id="star-2" class="star"></Star>
+      <Star id="star-3" class="star"></Star>
+    </div>
+    <div id="result-score" class="heading">Score: 0</div>
+    <div id="result-detail" class="body">0 parts sorted</div>
+    <Button id="next-level-button" class="button">
+      <ButtonLabel class="button-label">NEXT LEVEL</ButtonLabel>
+    </Button>
+    <div class="row-buttons">
+      <Button id="again-button" class="button-small grow">
+        <ButtonLabel class="button-small-label">AGAIN</ButtonLabel>
+      </Button>
+      <Button id="menu-button-result" class="button-small grow" variant="secondary">
+        <ButtonLabel class="button-small-label">MENU</ButtonLabel>
+      </Button>
+    </div>
+  </div>
+  <div id="program-view" class="view" style="display: none">
+    <div class="prog-head">
+      <div id="prog-title" class="stat-label">CHALLENGE 1/3</div>
+      <Button id="menu-button-prog" class="button-tiny" variant="secondary">
+        <ButtonLabel class="button-tiny-label">MENU</ButtonLabel>
+      </Button>
+    </div>
+    <div id="prog-edit" class="prog-col">
+      <div id="prog-instr" class="prog-instr">Drive to the star</div>
+      <div class="slots">
+      <div id="slot-0" class="slot">
+        <ArrowUp id="slot-0-fwd" class="slot-icon" style="display: none"></ArrowUp>
+        <ArrowDown id="slot-0-back" class="slot-icon" style="display: none"></ArrowDown>
+        <RotateCcw id="slot-0-left" class="slot-icon" style="display: none"></RotateCcw>
+        <RotateCw id="slot-0-right" class="slot-icon" style="display: none"></RotateCw>
+        <Repeat id="slot-0-rep" class="slot-icon" style="display: none"></Repeat>
+      </div>
+      <div id="slot-1" class="slot">
+        <ArrowUp id="slot-1-fwd" class="slot-icon" style="display: none"></ArrowUp>
+        <ArrowDown id="slot-1-back" class="slot-icon" style="display: none"></ArrowDown>
+        <RotateCcw id="slot-1-left" class="slot-icon" style="display: none"></RotateCcw>
+        <RotateCw id="slot-1-right" class="slot-icon" style="display: none"></RotateCw>
+        <Repeat id="slot-1-rep" class="slot-icon" style="display: none"></Repeat>
+      </div>
+      <div id="slot-2" class="slot">
+        <ArrowUp id="slot-2-fwd" class="slot-icon" style="display: none"></ArrowUp>
+        <ArrowDown id="slot-2-back" class="slot-icon" style="display: none"></ArrowDown>
+        <RotateCcw id="slot-2-left" class="slot-icon" style="display: none"></RotateCcw>
+        <RotateCw id="slot-2-right" class="slot-icon" style="display: none"></RotateCw>
+        <Repeat id="slot-2-rep" class="slot-icon" style="display: none"></Repeat>
+      </div>
+      <div id="slot-3" class="slot">
+        <ArrowUp id="slot-3-fwd" class="slot-icon" style="display: none"></ArrowUp>
+        <ArrowDown id="slot-3-back" class="slot-icon" style="display: none"></ArrowDown>
+        <RotateCcw id="slot-3-left" class="slot-icon" style="display: none"></RotateCcw>
+        <RotateCw id="slot-3-right" class="slot-icon" style="display: none"></RotateCw>
+        <Repeat id="slot-3-rep" class="slot-icon" style="display: none"></Repeat>
+      </div>
+      <div id="slot-4" class="slot">
+        <ArrowUp id="slot-4-fwd" class="slot-icon" style="display: none"></ArrowUp>
+        <ArrowDown id="slot-4-back" class="slot-icon" style="display: none"></ArrowDown>
+        <RotateCcw id="slot-4-left" class="slot-icon" style="display: none"></RotateCcw>
+        <RotateCw id="slot-4-right" class="slot-icon" style="display: none"></RotateCw>
+        <Repeat id="slot-4-rep" class="slot-icon" style="display: none"></Repeat>
+      </div>
+      <div id="slot-5" class="slot">
+        <ArrowUp id="slot-5-fwd" class="slot-icon" style="display: none"></ArrowUp>
+        <ArrowDown id="slot-5-back" class="slot-icon" style="display: none"></ArrowDown>
+        <RotateCcw id="slot-5-left" class="slot-icon" style="display: none"></RotateCcw>
+        <RotateCw id="slot-5-right" class="slot-icon" style="display: none"></RotateCw>
+        <Repeat id="slot-5-rep" class="slot-icon" style="display: none"></Repeat>
+      </div>
+      <div id="slot-6" class="slot">
+        <ArrowUp id="slot-6-fwd" class="slot-icon" style="display: none"></ArrowUp>
+        <ArrowDown id="slot-6-back" class="slot-icon" style="display: none"></ArrowDown>
+        <RotateCcw id="slot-6-left" class="slot-icon" style="display: none"></RotateCcw>
+        <RotateCw id="slot-6-right" class="slot-icon" style="display: none"></RotateCw>
+        <Repeat id="slot-6-rep" class="slot-icon" style="display: none"></Repeat>
+      </div>
+      <div id="slot-7" class="slot">
+        <ArrowUp id="slot-7-fwd" class="slot-icon" style="display: none"></ArrowUp>
+        <ArrowDown id="slot-7-back" class="slot-icon" style="display: none"></ArrowDown>
+        <RotateCcw id="slot-7-left" class="slot-icon" style="display: none"></RotateCcw>
+        <RotateCw id="slot-7-right" class="slot-icon" style="display: none"></RotateCw>
+        <Repeat id="slot-7-rep" class="slot-icon" style="display: none"></Repeat>
+      </div>
+      </div>
+      <div class="row-buttons">
+        <Button id="cmd-fwd" class="cmd grow">
+          <ButtonIcon><ArrowUp></ArrowUp></ButtonIcon>
+          <ButtonLabel class="cmd-label">FORWARD</ButtonLabel>
+        </Button>
+        <Button id="cmd-back" class="cmd grow">
+          <ButtonIcon><ArrowDown></ArrowDown></ButtonIcon>
+          <ButtonLabel class="cmd-label">BACK</ButtonLabel>
+        </Button>
+      </div>
+      <div class="row-buttons">
+        <Button id="cmd-left" class="cmd grow">
+          <ButtonIcon><RotateCcw></RotateCcw></ButtonIcon>
+          <ButtonLabel class="cmd-label">LEFT</ButtonLabel>
+        </Button>
+        <Button id="cmd-right" class="cmd grow">
+          <ButtonIcon><RotateCw></RotateCw></ButtonIcon>
+          <ButtonLabel class="cmd-label">RIGHT</ButtonLabel>
+        </Button>
+        <Button id="cmd-rep" class="cmd grow">
+          <ButtonIcon><Repeat></Repeat></ButtonIcon>
+          <ButtonLabel class="cmd-label">x2</ButtonLabel>
+        </Button>
+      </div>
+      <div class="row-buttons">
+        <Button id="prog-undo" class="cmd grow" variant="secondary">
+          <ButtonIcon><Undo2></Undo2></ButtonIcon>
+          <ButtonLabel class="cmd-label">UNDO</ButtonLabel>
+        </Button>
+        <Button id="prog-clear" class="cmd grow" variant="secondary">
+          <ButtonIcon><Trash2></Trash2></ButtonIcon>
+          <ButtonLabel class="cmd-label">CLEAR</ButtonLabel>
+        </Button>
+        <Button id="prog-run" class="cmd grow">
+          <ButtonIcon><Play></Play></ButtonIcon>
+          <ButtonLabel class="cmd-label">RUN</ButtonLabel>
+        </Button>
+      </div>
+    </div>
+    <div id="prog-done" class="prog-col" style="display: none">
+      <div id="done-title" class="heading">Great!</div>
+      <div id="done-text" class="body">The robot reached the star.</div>
+      <div class="row-buttons">
+        <Button id="next-button" class="button-small grow">
+          <ButtonLabel id="next-label" class="button-small-label">NEXT</ButtonLabel>
+        </Button>
+        <Button id="menu-button-done" class="button-small grow" variant="secondary">
+          <ButtonLabel class="button-small-label">MENU</ButtonLabel>
+        </Button>
+      </div>
+    </div>
+  </div>
+  <div id="circuit-view" class="view" style="display: none">
+    <div class="prog-head">
+      <div class="stat-label">LEVEL 3  LIGHT IT UP</div>
+      <div class="row-buttons">
+        <Button id="circ-part2" class="button-tiny" variant="secondary">
+          <ButtonLabel class="button-tiny-label">PART 2</ButtonLabel>
+        </Button>
+        <Button id="menu-button-circ" class="button-tiny" variant="secondary">
+          <ButtonLabel class="button-tiny-label">MENU</ButtonLabel>
+        </Button>
+      </div>
+    </div>
+    <div id="circ-edit" class="prog-col">
+      <div class="tut-sub">A simplified circuit model</div>
+      <div class="tut-step-row">
+        <Pointer class="step-icon"></Pointer>
+        <div class="step-text">Pinch two dots: a wire</div>
+      </div>
+      <div class="tut-step-row">
+        <Lightbulb class="step-icon"></Lightbulb>
+        <div class="step-text">Battery, switch, resistor, LED</div>
+      </div>
+      <div class="tut-step-row">
+        <Zap class="step-icon"></Zap>
+        <div class="step-text">Press POWER to test</div>
+      </div>
+      <div id="circ-msg" class="prog-instr">Pinch two dots to add a wire</div>
+      <div class="row-buttons">
+        <Button id="circ-undo" class="cmd grow" variant="secondary">
+          <ButtonIcon><Undo2></Undo2></ButtonIcon>
+          <ButtonLabel class="cmd-label">UNDO</ButtonLabel>
+        </Button>
+        <Button id="circ-clear" class="cmd grow" variant="secondary">
+          <ButtonIcon><Trash2></Trash2></ButtonIcon>
+          <ButtonLabel class="cmd-label">CLEAR</ButtonLabel>
+        </Button>
+        <Button id="circ-power" class="cmd grow">
+          <ButtonIcon><Power></Power></ButtonIcon>
+          <ButtonLabel class="cmd-label">POWER</ButtonLabel>
+        </Button>
+      </div>
+    </div>
+    <div id="circ-done" class="prog-col" style="display: none">
+      <div class="heading">Level complete!</div>
+      <div class="body">You lit the LED. Next: build a robot.</div>
+      <div class="row-buttons">
+        <Button id="circ-next" class="button-small grow">
+          <ButtonLabel class="button-small-label">NEXT</ButtonLabel>
+        </Button>
+        <Button id="menu-button-circ-done" class="button-small grow" variant="secondary">
+          <ButtonLabel class="button-small-label">MENU</ButtonLabel>
+        </Button>
+      </div>
+    </div>
+  </div>
+  <div id="build-view" class="view" style="display: none">
+    <div class="prog-head">
+      <div class="stat-label">LEVEL 3  PART 2</div>
+      <Button id="menu-button-build" class="button-tiny" variant="secondary">
+        <ButtonLabel class="button-tiny-label">MENU</ButtonLabel>
+      </Button>
+    </div>
+    <div id="build-edit" class="prog-col">
+      <div class="tut-sub">Build the robot (simplified demo)</div>
+      <div class="tut-step-row">
+        <Grab class="step-icon"></Grab>
+        <div class="step-text">Pinch a part</div>
+      </div>
+      <div class="tut-step-row">
+        <Target class="step-icon"></Target>
+        <div class="step-text">Drop on its glowing spot</div>
+      </div>
+      <div class="tut-step-row">
+        <Play class="step-icon"></Play>
+        <div class="step-text">Press GO to drive</div>
+      </div>
+      <div id="build-msg" class="prog-instr">Pinch a part</div>
+      <Button id="build-go" class="button" style="display: none">
+        <ButtonLabel class="button-label">GO</ButtonLabel>
+      </Button>
+    </div>
+    <div id="build-done" class="prog-col" style="display: none">
+      <div class="heading">Robot built!</div>
+      <div class="body">Your robot drove its first path.</div>
+      <Button id="menu-button-build-done" class="button-small" variant="secondary">
+        <ButtonLabel class="button-small-label">MENU</ButtonLabel>
+      </Button>
+    </div>
+  </div>
+</Panel>

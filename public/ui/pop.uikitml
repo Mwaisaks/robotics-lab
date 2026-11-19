@@ -1,0 +1,23 @@
+<!--
+  "+10" pop shown briefly above a bin on a correct placement (GameSystem moves,
+  scales and hides it). Plain div, so the colors hold in both color schemes.
+-->
+<style>
+  .pop {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 20px;
+    background-color: #1f9d55;
+  }
+
+  .text {
+    color: #ffffff;
+    font-size: 44px;
+    font-weight: 700;
+  }
+</style>
+<div class="pop">
+  <span class="text">+10</span>
+</div>
