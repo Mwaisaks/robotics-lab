@@ -1,6 +1,8 @@
 import { createSystem, Grabbed, PhysicsSystem } from '@iwsdk/core';
 import { Part } from './lab-components.js';
 import { LAYOUT } from './lab.js';
+import { MISTAKE } from './core/events.js';
+import { learning } from './learning.js';
 
 const IDENTITY: [number, number, number, number] = [0, 0, 0, 1];
 const MAX_DISTANCE = 1.2; // metres from the play-area centre
@@ -26,6 +28,7 @@ export class PartRespawnSystem extends createSystem({
       const fell = dy < -0.25;
       const away = dx * dx + dy * dy + dz * dz > MAX_DISTANCE * MAX_DISTANCE;
       if (!fell && !away) continue;
+      learning.mistake('sort', MISTAKE.DROPPED_OFF_TABLE, fell ? 'fell' : 'thrown');
       const h = entity.getVectorView(Part, 'home');
       this.home[0] = h[0];
       this.home[1] = h[1];

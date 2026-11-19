@@ -19,6 +19,7 @@ import { ARM_SIGNAL, LAYOUT, placeGamePanel, toWorld } from './lab.js';
 import { NAV, PHASE_PROGRAM } from './nav.js';
 import { markLevelDone } from './progress.js';
 import { playSfx } from './sfx.js';
+import { MISTAKE } from './core/events.js';
 import { programStars } from './core/stars.js';
 import { learning, modeOf } from './learning.js';
 
@@ -297,7 +298,11 @@ export class ProgramSystem extends createSystem({
   }
 
   private add(c: Cmd): void {
-    if (this.running || this.program.length >= MAX_BLOCKS) return;
+    if (this.running) return;
+    if (this.program.length >= MAX_BLOCKS) {
+      learning.mistake('program', MISTAKE.TOO_MANY_BLOCKS);
+      return;
+    }
     this.program.push(c);
     playSfx('grab');
     learning.action('program', `add_${c}`);
@@ -334,7 +339,11 @@ export class ProgramSystem extends createSystem({
   }
 
   private run(): void {
-    if (this.running || this.program.length === 0) return;
+    if (this.running) return;
+    if (this.program.length === 0) {
+      learning.mistake('program', MISTAKE.EMPTY_PROGRAM);
+      return;
+    }
     this.runs++;
     learning.action('program', 'run');
     this.placeRobotAtStart();
@@ -351,7 +360,7 @@ export class ProgramSystem extends createSystem({
       this.renderProgram(-1);
       if (!this.success) {
         this.ui['prog-instr']?.setProperties({ text: 'Not there yet. Try again!' });
-        learning.mistake('program', 'MISSED_GOAL');
+        learning.mistake('program', MISTAKE.MISSED_GOAL);
       }
       return;
     }
@@ -424,7 +433,7 @@ export class ProgramSystem extends createSystem({
       this.running = false;
       this.renderProgram(-1);
       this.ui['prog-instr']?.setProperties({ text: 'Bump! Edge of the grid.' });
-      learning.mistake('program', 'HIT_WALL');
+      learning.mistake('program', MISTAKE.HIT_WALL);
       return;
     }
     const goal = CHALLENGES[this.challenge].goal;

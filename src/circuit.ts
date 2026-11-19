@@ -23,7 +23,7 @@ import { ARM_SIGNAL, LAYOUT, placeGamePanel, toWorld } from './lab.js';
 import { NAV, PHASE_CIRCUIT } from './nav.js';
 import { markLevelDone } from './progress.js';
 import { playSfx } from './sfx.js';
-import type { MistakeCode } from './core/events.js';
+import { MISTAKE, type MistakeCode } from './core/events.js';
 import { mistakeStars } from './core/stars.js';
 import { learning, modeOf } from './learning.js';
 
@@ -447,20 +447,20 @@ export class CircuitSystem extends createSystem({
     };
     walk(net(T_BAT_PLUS));
 
-    if (paths.length === 0) return { ok: false, msg: "The circuit isn't closed", code: 'OPEN_LOOP' };
+    if (paths.length === 0) return { ok: false, msg: "The circuit isn't closed", code: MISTAKE.OPEN_LOOP };
     const withLed = paths.filter((p) => p.comps.has('led'));
     if (withLed.length === 0) {
       // A loop with neither LED nor resistor goes straight from + to -: a short circuit.
       const short = paths.some((p) => !p.comps.has('resistor'));
       return short
-        ? { ok: false, msg: 'Put the LED in the loop', code: 'SHORT_CIRCUIT' }
-        : { ok: false, msg: 'Put the LED in the loop', code: 'OPEN_LOOP', detail: 'led_not_in_loop' };
+        ? { ok: false, msg: 'Put the LED in the loop', code: MISTAKE.SHORT_CIRCUIT }
+        : { ok: false, msg: 'Put the LED in the loop', code: MISTAKE.LED_NOT_IN_LOOP };
     }
     const forward = withLed.filter((p) => p.ledForward);
-    if (forward.length === 0) return { ok: false, msg: 'Flip the LED', code: 'LED_REVERSED' };
+    if (forward.length === 0) return { ok: false, msg: 'Flip the LED', code: MISTAKE.LED_REVERSED };
     const safe = forward.filter((p) => p.comps.has('resistor'));
-    if (safe.length === 0) return { ok: false, msg: 'Add a resistor to protect the LED', code: 'NO_RESISTOR' };
-    if (!safe.some((p) => p.comps.has('switch'))) return { ok: false, msg: 'Add the switch to the loop', code: 'NO_SWITCH' };
+    if (safe.length === 0) return { ok: false, msg: 'Add a resistor to protect the LED', code: MISTAKE.NO_RESISTOR };
+    if (!safe.some((p) => p.comps.has('switch'))) return { ok: false, msg: 'Add the switch to the loop', code: MISTAKE.SWITCH_NOT_IN_LOOP };
     return { ok: true, msg: 'It lights up!' };
   }
 

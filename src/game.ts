@@ -13,7 +13,7 @@ import { Bin, GameState, Part } from './lab-components.js';
 import { initSfx, playSfx } from './sfx.js';
 import { NAV, PHASE_BUILD, PHASE_CIRCUIT, PHASE_MENU, PHASE_PROGRAM } from './nav.js';
 import { isLevelDone, markLevelDone } from './progress.js';
-import type { Stars } from './core/events.js';
+import { MISTAKE, type Stars } from './core/events.js';
 import { sortStars } from './core/stars.js';
 import { learning, modeOf } from './learning.js';
 import {
@@ -515,7 +515,7 @@ export class GameSystem extends createSystem({
         if (this.scored.every(Boolean)) this.refillIn = REFILL_DELAY;
       } else {
         if (!tutorial) this.setText('feedback', 'Wrong bin. Try again.');
-        learning.mistake('sort', 'WRONG_BIN', `part ${slot} in bin ${binSlot}`);
+        learning.mistake('sort', MISTAKE.WRONG_BIN, `part ${slot} in bin ${binSlot}`);
         playSfx('wrong');
         this.sendHome(part);
       }
