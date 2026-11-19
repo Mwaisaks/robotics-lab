@@ -450,8 +450,8 @@ export class CircuitSystem extends createSystem({
     if (paths.length === 0) return { ok: false, msg: "The circuit isn't closed", code: MISTAKE.OPEN_LOOP };
     const withLed = paths.filter((p) => p.comps.has('led'));
     if (withLed.length === 0) {
-      // A loop with neither LED nor resistor goes straight from + to -: a short circuit.
-      const short = paths.some((p) => !p.comps.has('resistor'));
+      // Battery + wired straight to - with nothing between: a short circuit.
+      const short = paths.some((p) => p.comps.size === 0);
       return short
         ? { ok: false, msg: 'Put the LED in the loop', code: MISTAKE.SHORT_CIRCUIT }
         : { ok: false, msg: 'Put the LED in the loop', code: MISTAKE.LED_NOT_IN_LOOP };

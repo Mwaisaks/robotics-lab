@@ -48,15 +48,38 @@ describe('event bus', () => {
 });
 
 describe('mistake codes', () => {
-  it('lists the BRIEF codes for the three baseline levels', () => {
+  it('lists the agreed codes per activity', () => {
     expect(MISTAKE_CODES.sort).toEqual(['WRONG_BIN', 'OUT_OF_REACH', 'DROPPED_OFF_TABLE']);
     expect(MISTAKE_CODES.program).toEqual([
-      'HIT_WALL', 'HIT_OBSTACLE', 'MISSED_GOAL', 'TOO_MANY_BLOCKS', 'EMPTY_PROGRAM',
+      'HIT_WALL', 'HIT_OBSTACLE', 'MISSED_GOAL', 'WRONG_TURN', 'TOO_MANY_BLOCKS', 'EMPTY_PROGRAM',
     ]);
     expect(MISTAKE_CODES.circuit).toEqual([
-      'OPEN_LOOP', 'LED_REVERSED', 'NO_RESISTOR', 'SHORT_CIRCUIT', 'LED_NOT_IN_LOOP', 'SWITCH_NOT_IN_LOOP',
+      'OPEN_LOOP', 'LED_REVERSED', 'NO_RESISTOR', 'SHORT_CIRCUIT', 'LED_NOT_IN_LOOP', 'SWITCH_NOT_IN_LOOP', 'SWITCH_OFF',
     ]);
     expect(MISTAKE_CODES.build).toEqual(['WRONG_SLOT']);
+  });
 
+  // docs/activities/mistake-codes.md (Joshua) is the source of truth: same codes, same order.
+  const docs = import.meta.glob<string>('../../docs/activities/mistake-codes.md', {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  });
+  const doc = Object.values(docs)[0];
+
+  it.skipIf(doc === undefined)('match docs/activities/mistake-codes.md exactly', () => {
+    const fromDoc: Record<string, string[]> = {};
+    let activity: string | null = null;
+    for (const line of doc!.split('\n')) {
+      const header = /^## .*\(`(\w+)`/.exec(line);
+      if (header) activity = header[1];
+      else if (line.startsWith('## ')) activity = null;
+      const row = /^\| `([A-Z_]+)` \|/.exec(line);
+      if (row && activity) (fromDoc[activity] ??= []).push(row[1]);
+    }
+    expect(Object.keys(fromDoc).length).toBeGreaterThan(0);
+    for (const [act, codes] of Object.entries(fromDoc)) {
+      expect(MISTAKE_CODES[act as keyof typeof MISTAKE_CODES], act).toEqual(codes);
+    }
   });
 });
