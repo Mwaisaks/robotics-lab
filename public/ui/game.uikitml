@@ -163,6 +163,46 @@
     color: #1f9d55;
   }
 
+  .menu-button {
+    margin-top: 2px;
+    height: 60px;
+    justify-content: center;
+  }
+
+  .menu-label {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .group {
+    margin-top: 10px;
+    color: #6b5a00;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+  }
+
+  .group:dark {
+    color: #f5d90a;
+  }
+
+  .soon {
+    margin-top: 2px;
+    width: 100%;
+    padding-x: 12px;
+    padding-y: 8px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #5a5d66;
+    color: #5a5d66;
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .soon:dark {
+    color: #b8bac0;
+  }
+
   .row-buttons {
     flex-direction: row;
     gap: 12px;
@@ -294,21 +334,33 @@
   <div id="menu-view" class="view">
     <div class="eyebrow">ROBOT ARM LAB</div>
     <div class="heading">Choose a level</div>
-    <Button id="level1-button" class="level-button">
-      <ButtonLabel class="level-label">1  SORT PARTS</ButtonLabel>
-      <ButtonIcon><Check id="tick-1" class="tick" style="display: none"></Check></ButtonIcon>
+    <div class="group">BEGINNER</div>
+    <div class="row-buttons">
+      <Button id="level1-button" class="menu-button grow">
+        <ButtonLabel class="menu-label">1  SORT</ButtonLabel>
+        <ButtonIcon><Check id="tick-1" class="tick" style="display: none"></Check></ButtonIcon>
+      </Button>
+      <Button id="level2-button" class="menu-button grow">
+        <ButtonLabel class="menu-label">2  PROGRAM</ButtonLabel>
+        <ButtonIcon><Check id="tick-2" class="tick" style="display: none"></Check></ButtonIcon>
+      </Button>
+    </div>
+    <div class="row-buttons">
+      <Button id="level3-button" class="menu-button grow">
+        <ButtonLabel class="menu-label">3  LIGHT IT UP</ButtonLabel>
+        <ButtonIcon><Check id="tick-3" class="tick" style="display: none"></Check></ButtonIcon>
+      </Button>
+      <Button id="build-button" class="menu-button grow">
+        <ButtonLabel class="menu-label">3B  BUILD</ButtonLabel>
+        <ButtonIcon><Check id="tick-3b" class="tick" style="display: none"></Check></ButtonIcon>
+      </Button>
+    </div>
+    <div class="group">INTERMEDIATE</div>
+    <Button id="level4-button" class="menu-button">
+      <ButtonLabel id="level4-label" class="menu-label">4  MICROCONTROLLER LAB</ButtonLabel>
     </Button>
-    <Button id="level2-button" class="level-button">
-      <ButtonLabel class="level-label">2  PROGRAM ROBOT</ButtonLabel>
-      <ButtonIcon><Check id="tick-2" class="tick" style="display: none"></Check></ButtonIcon>
-    </Button>
-    <Button id="level3-button" class="level-button">
-      <ButtonLabel class="level-label">3  LIGHT IT UP</ButtonLabel>
-      <ButtonIcon><Check id="tick-3" class="tick" style="display: none"></Check></ButtonIcon>
-    </Button>
-    <Button id="level4-button" class="level-button">
-      <ButtonLabel id="level4-label" class="level-label">4  MICROCONTROLLER</ButtonLabel>
-    </Button>
+    <div class="group">ADVANCED</div>
+    <div id="advanced-soon" class="soon">Coming soon: arm control, IK, PID</div>
     <Button id="exit-button-menu" class="button-small" variant="secondary">
       <ButtonLabel class="button-small-label">EXIT</ButtonLabel>
     </Button>
