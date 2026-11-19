@@ -30,17 +30,16 @@ These are our own team checkpoints, not organiser gates.
 
 | Time | What must be true |
 |---|---|
-| 9:00pm | Robo built-in hints in Levels 1–3; Level 1 plays in the browser |
-| 11:30pm | Quest test (all levels, hints visible) |
-| 12:30am | All levels in the browser and on the Quest; the dashboard shows a test class; tag `demo-1` |
-| 4:00am | No new features start after this. README draft done. |
-| 4:30am | Quest test; tag `demo-2` after a full regression |
-| **6:00am** | **FEATURE FREEZE:** bug fixes only |
-| 6:00–8:00am | README and slides final |
-| **8:00–9:00am** | **SUBMIT** (we submit by 9:00am) |
-| 9:00–10:00am | Buffer only. Final submission closes **Fri 10:00am**. |
+| 11:30pm | Quest test: all levels + Robo hints |
+| 12:30am | Rebecca's final PR merged; tag `demo-1` |
+| 1:30am | No new features start after this. README draft done. |
+| 2:30am | Quest test + full regression; tag `demo-2` |
+| **3:00am** | **FEATURE FREEZE:** bug fixes only |
+| 3:00–4:30am | README, slides and footage final |
+| **4:30–5:00am** | **SUBMIT** |
+| 5:00–6:00am | Buffer only. Submission closes **Fri 6:00am**. |
 
-Each checkpoint is a short voice call (9:00pm, 12:30am, 4:00am, 6:00am, 8:00am). Rebecca joins online.
+Each checkpoint is a short voice call (11:30pm, 12:30am, 1:30am, 3:00am, 4:30am). Rebecca joins online.
 
 ## 3. Install (once)
 You need:

@@ -1,7 +1,7 @@
 # STATUS — update your line at least every 2 hours (EAT)
 
-Next checkpoint: 9:00pm — Robo built-in hints in Levels 1-3; Level 1 plays in the browser.
-Then: 11:30pm Quest test · 12:30am all levels browser + Quest, dashboard test class, tag demo-1 · 4:00am no new features · 4:30am Quest test · 6:00am FREEZE · submit 8:00-9:00am (closes Fri 10:00am).
+Next checkpoint: 11:30pm — Quest test, all levels + Robo hints.
+Then: 12:30am Rebecca's final PR merged + tag demo-1 · 1:30am no new features · 2:30am Quest test + regression + tag demo-2 · 3:00am FREEZE · 3:00-4:30am README/slides/footage · submit 4:30-5:00am (closes Fri 6:00am).
 
 | Who | Working on (branch) | Done | Blocked by | Updated |
 |---|---|---|---|---|
