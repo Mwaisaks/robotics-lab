@@ -5,6 +5,7 @@ import {
   createHintCache,
   createRateLimiter,
   hintCacheKey,
+  SERVER_HINT_BUDGET_MS,
   getHint,
   OFF_TOPIC,
   parseHintRequest,
@@ -125,7 +126,7 @@ describe('getHint', () => {
     await expect(getHint(req, async () => 'Visit https://x.y')).resolves.toMatchObject({ source: 'builtin' });
   });
 
-  it('times out after 3 s, aborts the call and falls back', async () => {
+  it('times out after the 5.5 s server budget, aborts the call and falls back', async () => {
     vi.useFakeTimers();
     try {
       let seen: AbortSignal | undefined;
@@ -134,7 +135,7 @@ describe('getHint', () => {
         return new Promise<string>(() => {});
       };
       const pending = getHint(req, slow);
-      await vi.advanceTimersByTimeAsync(2999);
+      await vi.advanceTimersByTimeAsync(SERVER_HINT_BUDGET_MS - 1);
       expect(seen?.aborted).toBe(false);
       await vi.advanceTimersByTimeAsync(1);
       await expect(pending).resolves.toEqual({ text: builtinHint('program', 'HIT_WALL', 'en'), source: 'builtin' });
@@ -151,8 +152,13 @@ describe('getHint', () => {
 });
 
 describe('createHintCache', () => {
-  it('keys by activity+code+lang+attempt and drops the oldest entry when full', () => {
-    expect(hintCacheKey({ activity: 'program', code: 'HIT_WALL', lang: 'sw', attempt: 2 })).toBe('program|HIT_WALL|sw|2');
+  it('keys by the full request including context, and drops the oldest entry when full', () => {
+    const base = { activity: 'program', code: 'HIT_WALL', lang: 'sw', attempt: 2 } as const;
+    expect(hintCacheKey(base)).toBe(hintCacheKey({ ...base, context: undefined }));
+    expect(hintCacheKey({ ...base, context: 'FORWARD x5' })).not.toBe(hintCacheKey(base));
+    expect(hintCacheKey({ ...base, context: 'FORWARD x5' })).not.toBe(hintCacheKey({ ...base, context: 'FORWARD x4' }));
+    expect(hintCacheKey({ ...base, attempt: 3 })).not.toBe(hintCacheKey(base));
+    expect(hintCacheKey({ ...base, lang: 'en' })).not.toBe(hintCacheKey(base));
     const cache = createHintCache(2);
     cache.set('a', '1');
     cache.set('b', '2');

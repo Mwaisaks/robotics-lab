@@ -6,16 +6,16 @@
  * - Calls Google Gemini over REST with plain fetch. Key stays here (env LLM_API_KEY), never in the browser.
  * - Tries the models in HINT_MODELS in order: 429/503 (busy) or 404 -> next model at once;
  *   400 about thinking -> same model once more without thinkingConfig.
- * - All models and retries share ONE 3 s budget; then (or on any other failure) -> built-in hint (still 200).
- * - Good AI answers are cached by activity+code+lang+attempt, so repeats are instant.
+ * - All models and retries share ONE 5.5 s budget (SERVER_HINT_BUDGET_MS); then (or on any other failure) -> built-in hint (still 200).
+ * - Good AI answers are cached by the full request (activity, code, lang, attempt, context), so repeats are instant.
  * - Simple per-IP rate limit; over the limit -> cached or built-in hint, no LLM call.
  * - Only activity/code/attempt/lang/context reach the LLM; nicknames and class codes are dropped.
  * API reference: https://aistudio.google.com/api-reference/generate-content
  */
-import { createHintCache, createRateLimiter, getHint, parseHintRequest, type LlmCall } from '../src/tutor/ai-hint.js';
+import { createHintCache, createRateLimiter, getHint, parseHintRequest, SERVER_HINT_BUDGET_MS, type LlmCall } from '../src/tutor/ai-hint.js';
 
 // gemini-2.5 models are not available on our key. Override with HINT_MODELS="a,b,c" in Vercel.
-const DEFAULT_MODELS = 'gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash-lite';
+const DEFAULT_MODELS = 'gemini-3.5-flash-lite,gemini-3.8-flash,gemini-3.7-flash';
 const MODELS = (process.env.HINT_MODELS || DEFAULT_MODELS)
   .split(',')
   .map((m) => m.trim())
@@ -54,7 +54,7 @@ const callGemini: LlmCall | undefined = apiKey
                 ...(withThinking ? { thinkingConfig: THINKING_CONFIG } : {}),
               },
             }),
-            signal, // the shared 3 s budget: aborts whichever model is running
+            signal, // the shared 5.5 s budget: aborts whichever model is running
           });
           if (res.ok) {
             const data = (await res.json()) as GeminiResponse;
@@ -98,5 +98,5 @@ export async function POST(request: Request): Promise<Response> {
 
   // Over the limit: no LLM call, but a cached AI answer is still fine to return.
   const llm = allow(clientIp(request)) ? callGemini : undefined;
-  return json(await getHint(req, llm, { cache }));
+  return json(await getHint(req, llm, { cache, timeoutMs: SERVER_HINT_BUDGET_MS }));
 }
