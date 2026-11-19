@@ -12,9 +12,9 @@ AI tutor "Robo" explains mistakes (English + Kiswahili). Teacher dashboard shows
 Full context: docs/BRIEF.md. Your role: agents/<your-role>.md. Activity rules: docs/activities/*.md. Live state: docs/STATUS.md.
 
 ## Timeline (EAT) — the clock wins over features
-Team checkpoints (ours, not organiser gates): Start Thu 4:00pm · 9:00pm Robo hints in Levels 1-3 + Level 1 in browser · 11:30pm Quest test ·
-12:30am all levels in browser + Quest, dashboard test class, tag demo-1 · no new features after 4:00am · 4:30am Quest test ·
-FEATURE FREEZE 6:00am · README/slides final 6:00-8:00am · SUBMIT 8:00-9:00am · buffer 9:00-10:00am · final submission closes Fri 10:00am.
+**Submission closes Fri 6:00am EAT.** Team checkpoints (ours, not organiser gates): 11:30pm Quest test (all levels + Robo) ·
+12:30am Rebecca's final PR merged + tag demo-1 · no new features after 1:30am · 2:30am Quest test + regression + tag demo-2 ·
+FEATURE FREEZE 3:00am · README/slides/footage 3:00-4:30am · SUBMIT 4:30-5:00am · buffer to 6:00am.
 Run `TZ=Africa/Nairobi date` at the start of every report and say how long until the next checkpoint.
 
 ## Hard rules
