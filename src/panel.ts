@@ -34,7 +34,8 @@ export class PanelSystem extends createSystem({}) {
         exitButton.setProperties({ display: is2D ? 'none' : 'flex' });
         // In XR the game panel has EXIT; hide this far-away welcome panel to save draw calls.
         const welcome = this.world.getSceneEntity('welcome-panel')?.object3D;
-        if (welcome) welcome.visible = is2D;
+        // On the flat page the DOM start screen (src/shell/start-screen.ts) replaces it.
+        if (welcome) welcome.visible = false;
       }),
     );
   }
