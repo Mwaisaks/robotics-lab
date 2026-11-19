@@ -9,8 +9,8 @@
     "HIT_OBSTACLE": "Kuna kizuizi njiani. Jaribu kugeuka kabla ya kusonga mbele.",
     "MISSED_GOAL": "Umekaribia! Programu imeisha kabla ya nyota. Ongeza hatua zinazokosekana.",
     "WRONG_TURN": "Kushoto na kulia ni kwa mtazamo wa roboti. Angalia macho yake yanaelekea wapi.",
-    "TOO_MANY_BLOCKS": "Umeweza! Je, unaweza kutumia RUDIA ili utumie vipande vichache?",
-    "EMPTY_PROGRAM": "Ongeza vipande kwanza, kisha bonyeza ENDESHA."
+    "TOO_MANY_BLOCKS": "Umeweza! Je, unaweza kutumia RUDIA (REPEAT) ili utumie vipande vichache?",
+    "EMPTY_PROGRAM": "Ongeza vipande kwanza, kisha bonyeza ENDESHA (RUN)."
   },
   "circuit": {
     "OPEN_LOOP": "Umeme unahitaji mzunguko kamili. Unganisha tena upande hasi wa betri.",
