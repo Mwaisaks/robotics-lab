@@ -4,20 +4,28 @@
  * Body: HintRequest { activity, code, attempt, lang, context? }  ->  HintResponse { text, source }
  *
  * - Calls Google Gemini over REST with plain fetch. Key stays here (env LLM_API_KEY), never in the browser.
- * - 3 s timeout; on timeout, error, blocked or off-topic/too-long answer -> built-in hint (still 200).
- * - Simple per-IP rate limit; over the limit -> built-in hint, no LLM call.
+ * - Tries the models in HINT_MODELS in order: 429/503 (busy) or 404 -> next model at once;
+ *   400 about thinking -> same model once more without thinkingConfig.
+ * - All models and retries share ONE 3 s budget; then (or on any other failure) -> built-in hint (still 200).
+ * - Good AI answers are cached by activity+code+lang+attempt, so repeats are instant.
+ * - Simple per-IP rate limit; over the limit -> cached or built-in hint, no LLM call.
  * - Only activity/code/attempt/lang/context reach the LLM; nicknames and class codes are dropped.
  * API reference: https://aistudio.google.com/api-reference/generate-content
  */
-import { createRateLimiter, getHint, parseHintRequest, type LlmCall } from '../src/tutor/ai-hint.js';
-import { builtinHintResponse } from '../src/tutor/hints.js';
+import { createHintCache, createRateLimiter, getHint, parseHintRequest, type LlmCall } from '../src/tutor/ai-hint.js';
 
-// Gemini Flash by default; set HINT_MODEL in Vercel to switch model without a code change.
-const MODEL = process.env.HINT_MODEL || 'gemini-3.8-flash';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`;
+// gemini-2.5 models are not available on our key. Override with HINT_MODELS="a,b,c" in Vercel.
+const DEFAULT_MODELS = 'gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash-lite';
+const MODELS = (process.env.HINT_MODELS || DEFAULT_MODELS)
+  .split(',')
+  .map((m) => m.trim())
+  .filter(Boolean);
+
+const THINKING_CONFIG = { thinkingLevel: 'LOW' }; // MINIMAL is rejected by gemini-3.8-flash
 
 // Default 30 hints per minute per IP (env HINT_RATE_LIMIT). A class behind one school IP shares it, so keep it generous.
 const allow = createRateLimiter(Number(process.env.HINT_RATE_LIMIT) || 30, 60_000);
+const cache = createHintCache();
 
 const apiKey = process.env.LLM_API_KEY;
 
@@ -26,28 +34,44 @@ interface GeminiResponse {
   promptFeedback?: { blockReason?: string };
 }
 
+function geminiUrl(model: string): string {
+  return `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+}
+
 const callGemini: LlmCall | undefined = apiKey
   ? async (system, user, signal) => {
-      const res = await fetch(GEMINI_URL, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: system }] },
-          contents: [{ role: 'user', parts: [{ text: user }] }],
-          generationConfig: {
-            maxOutputTokens: 200,
-            // thinkingLevel is Gemini 3+ only (errors on older models); minimal thinking keeps us inside 3 s.
-            ...(MODEL.startsWith('gemini-3') ? { thinkingConfig: { thinkingLevel: 'MINIMAL' } } : {}),
-          },
-        }),
-        signal,
-      });
-      if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
-      const data = (await res.json()) as GeminiResponse;
-      const candidate = data.candidates?.[0];
-      // Blocked prompt, safety stop, cut-off answer, etc. -> '' -> built-in hint.
-      if (data.promptFeedback?.blockReason || candidate?.finishReason !== 'STOP') return '';
-      return (candidate.content?.parts ?? []).map((p) => p.text ?? '').join('');
+      for (const model of MODELS) {
+        let withThinking = true;
+        for (;;) {
+          const res = await fetch(geminiUrl(model), {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: system }] },
+              contents: [{ role: 'user', parts: [{ text: user }] }],
+              generationConfig: {
+                maxOutputTokens: 1024, // room for LOW thinking; the hint itself is checked for length
+                ...(withThinking ? { thinkingConfig: THINKING_CONFIG } : {}),
+              },
+            }),
+            signal, // the shared 3 s budget: aborts whichever model is running
+          });
+          if (res.ok) {
+            const data = (await res.json()) as GeminiResponse;
+            const candidate = data.candidates?.[0];
+            // Blocked prompt, safety stop, cut-off answer, etc. -> '' -> built-in hint.
+            if (data.promptFeedback?.blockReason || candidate?.finishReason !== 'STOP') return '';
+            return (candidate.content?.parts ?? []).map((p) => p.text ?? '').join('');
+          }
+          if (res.status === 400 && withThinking && /thinking/i.test(await res.text())) {
+            withThinking = false; // retry this model once without thinkingConfig
+            continue;
+          }
+          if (res.status === 429 || res.status === 503 || res.status === 404) break; // busy or unknown model -> next
+          throw new Error(`Gemini ${model} HTTP ${res.status}`);
+        }
+      }
+      throw new Error('All Gemini models busy or unavailable');
     }
   : undefined;
 
@@ -72,7 +96,7 @@ export async function POST(request: Request): Promise<Response> {
   const req = parseHintRequest(body);
   if (!req) return json({ error: 'invalid hint request' }, 400);
 
-  if (!allow(clientIp(request))) return json(builtinHintResponse(req));
-
-  return json(await getHint(req, callGemini));
+  // Over the limit: no LLM call, but a cached AI answer is still fine to return.
+  const llm = allow(clientIp(request)) ? callGemini : undefined;
+  return json(await getHint(req, llm, { cache }));
 }

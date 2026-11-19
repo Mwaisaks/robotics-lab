@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   buildUserPrompt,
   cleanHintText,
+  createHintCache,
   createRateLimiter,
+  hintCacheKey,
   getHint,
   OFF_TOPIC,
   parseHintRequest,
@@ -145,6 +147,28 @@ describe('getHint', () => {
   it('gives a generic hint for an unknown code when the LLM fails', async () => {
     const res = await getHint({ ...req, code: 'NEW_CODE' }, async () => '');
     expect(res).toEqual({ text: builtinHint('program', 'NEW_CODE', 'en'), source: 'builtin' });
+  });
+});
+
+describe('createHintCache', () => {
+  it('keys by activity+code+lang+attempt and drops the oldest entry when full', () => {
+    expect(hintCacheKey({ activity: 'program', code: 'HIT_WALL', lang: 'sw', attempt: 2 })).toBe('program|HIT_WALL|sw|2');
+    const cache = createHintCache(2);
+    cache.set('a', '1');
+    cache.set('b', '2');
+    cache.set('c', '3');
+    expect(cache.get('a')).toBeUndefined();
+    expect(cache.get('b')).toBe('2');
+    expect(cache.get('c')).toBe('3');
+  });
+
+  it('getHint returns a cached AI answer without calling the LLM', async () => {
+    const cache = createHintCache();
+    const llm = vi.fn(async () => 'Count the squares.');
+    await getHint(req, llm, { cache });
+    await expect(getHint(req, llm, { cache })).resolves.toEqual({ text: 'Count the squares.', source: 'ai' });
+    await expect(getHint(req, undefined, { cache })).resolves.toEqual({ text: 'Count the squares.', source: 'ai' });
+    expect(llm).toHaveBeenCalledTimes(1);
   });
 });
 

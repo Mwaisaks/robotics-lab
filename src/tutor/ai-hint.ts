@@ -103,15 +103,48 @@ export function cleanHintText(raw: string): string | null {
 /** The LLM call, injected by api/hint.ts. Must stop work when `signal` aborts. */
 export type LlmCall = (system: string, user: string, signal: AbortSignal) => Promise<string>;
 
+/** Cache key for AI answers: the same mistake, language and attempt get the same hint. */
+export function hintCacheKey(req: Pick<HintRequest, 'activity' | 'code' | 'lang' | 'attempt'>): string {
+  return `${req.activity}|${req.code}|${req.lang}|${req.attempt}`;
+}
+
+/** A small in-memory cache of good AI answers. Oldest entry is dropped when full. */
+export interface HintCache {
+  get(key: string): string | undefined;
+  set(key: string, text: string): void;
+}
+export function createHintCache(maxEntries = 500): HintCache {
+  const map = new Map<string, string>();
+  return {
+    get: (key) => map.get(key),
+    set(key, text) {
+      map.delete(key);
+      map.set(key, text);
+      if (map.size > maxEntries) map.delete(map.keys().next().value!);
+    },
+  };
+}
+
+export interface GetHintOptions {
+  /** Total budget for the whole LLM call (all models and retries). */
+  timeoutMs?: number;
+  /** Cached AI answers are returned instantly, even without an LLM call. */
+  cache?: HintCache;
+}
+
 /**
  * Ask the LLM for a hint; on timeout, error or a rejected answer, return the
- * built-in hint. Never throws.
+ * built-in hint. A cached AI answer is returned instantly. Never throws.
  */
 export async function getHint(
   req: HintRequest,
   callLlm: LlmCall | undefined,
-  timeoutMs: number = HINT_TIMEOUT_MS,
+  { timeoutMs = HINT_TIMEOUT_MS, cache }: GetHintOptions = {},
 ): Promise<HintResponse> {
+  const key = hintCacheKey(req);
+  const cached = cache?.get(key);
+  if (cached) return { text: cached, source: 'ai' };
+
   const fallback: HintResponse = { text: builtinHint(req.activity, req.code, req.lang), source: 'builtin' };
   if (!callLlm) return fallback;
 
@@ -126,7 +159,9 @@ export async function getHint(
   try {
     const raw = await Promise.race([callLlm(SYSTEM_PROMPT, buildUserPrompt(req), controller.signal), timeout]);
     const text = raw === null ? null : cleanHintText(raw);
-    return text ? { text, source: 'ai' } : fallback;
+    if (!text) return fallback;
+    cache?.set(key, text);
+    return { text, source: 'ai' };
   } catch {
     return fallback;
   } finally {
