@@ -298,11 +298,7 @@ export class ProgramSystem extends createSystem({
   }
 
   private add(c: Cmd): void {
-    if (this.running) return;
-    if (this.program.length >= MAX_BLOCKS) {
-      learning.mistake('program', MISTAKE.TOO_MANY_BLOCKS);
-      return;
-    }
+    if (this.running || this.program.length >= MAX_BLOCKS) return;
     this.program.push(c);
     playSfx('grab');
     learning.action('program', `add_${c}`);
