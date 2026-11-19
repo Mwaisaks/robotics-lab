@@ -7,7 +7,7 @@ Then: 12:30am Rebecca's final PR merged + tag demo-1 Â· 1:30am no new features Â
 |---|---|---|---|---|
 | Phenny | feat/core-events (PR) | Repo, CI, Pages fallback; events + mistake codes in Levels 1-3 | Vercel import (account owner) | 19 Nov |
 | Joshua | | | | |
-| Rebecca | feat/tutor-lookup (push, PR next) | docs/data.md schema; built-in hint lookup + tests; /api/hint (3 s timeout, fallback, rate limit) | LLM_API_KEY + HINT_MODEL in Vercel; Joshua hint PR merge | 19 Nov 7:00pm |
+| Rebecca | feat/tutor-robo (pushed, PR next) | Supabase schema; built-in hints; /api/hint on Gemini (model chain, 3 s, cache); Robo hook + browser hint box | Phenny: one line in src/index.ts to start Robo; Vercel LLM_API_KEY | 19 Nov 8:15pm |
 
 ## Baseline bugs (Joshua, from the Quest test)
 -
