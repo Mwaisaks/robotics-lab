@@ -7,7 +7,7 @@
   "program": {
     "HIT_WALL": "The robot hit the edge. Count the squares before you move forward.",
     "HIT_OBSTACLE": "Something is in the way. Try turning before you move forward.",
-    "MISSED_GOAL": "Close! The program ended before the star. Add the missing steps.",
+    "MISSED_GOAL": "Close! The program ended before the star, so add the missing steps.",
     "WRONG_TURN": "Left and right are from the robot's view. Look at where its eyes point.",
     "TOO_MANY_BLOCKS": "You did it! Can you use REPEAT to do it with fewer blocks?",
     "EMPTY_PROGRAM": "Add some blocks first, then press RUN."
