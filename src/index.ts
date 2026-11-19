@@ -18,6 +18,9 @@ import { PartRespawnSystem } from './part-respawn.js';
 import { ProgramSystem } from './program.js';
 import { TablePlacementSystem } from './table-placement.js';
 import { logEventsIfDebug } from './learning.js';
+import { HintPanelSystem } from './shell/hint-panel.js';
+import { setupStartScreen } from './shell/start-screen.js';
+import { BrowserModeSystem } from './web/browser-mode.js';
 
 logEventsIfDebug();
 
@@ -35,4 +38,7 @@ World.create(
   world.registerSystem(ProgramSystem);
   world.registerSystem(CircuitSystem);
   world.registerSystem(BuildSystem);
+  world.registerSystem(BrowserModeSystem);
+  world.registerSystem(HintPanelSystem);
+  setupStartScreen(world);
 });
