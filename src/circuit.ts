@@ -23,6 +23,9 @@ import { ARM_SIGNAL, LAYOUT, placeGamePanel, toWorld } from './lab.js';
 import { NAV, PHASE_CIRCUIT } from './nav.js';
 import { markLevelDone } from './progress.js';
 import { playSfx } from './sfx.js';
+import type { MistakeCode } from './core/events.js';
+import { mistakeStars } from './core/stars.js';
+import { learning, modeOf } from './learning.js';
 
 /**
  * Level 3, "Light it up": a simplified circuit model on the mat. Pinch one terminal,
@@ -146,6 +149,7 @@ export class CircuitSystem extends createSystem({
       if (this.done) return;
       this.wires.pop();
       this.rebuildWires();
+      learning.action('circuit', 'undo');
       this.setMsg('Pinch two dots to add a wire');
     });
     this.bind('circ-clear', () => {
@@ -154,6 +158,7 @@ export class CircuitSystem extends createSystem({
       this.select(-1);
       this.rebuildWires();
       this.setMsg('Pinch two dots to add a wire');
+      learning.action('circuit', 'clear');
     });
     this.bind('circ-power', () => this.power());
     this.bind('menu-button-circ', () => NAV.toMenu());
@@ -183,9 +188,11 @@ export class CircuitSystem extends createSystem({
     this.setMsg('Pinch two dots to add a wire');
     this.ui['circ-edit']?.setProperties({ display: 'flex' });
     this.ui['circ-done']?.setProperties({ display: 'none' });
+    learning.start('circuit', 0, modeOf(this.world));
   }
 
   stop(): void {
+    if (learning.current === 'circuit') learning.abandon();
     for (const e of this.entities) e.dispose();
     this.entities.length = 0;
     this.root = undefined;
@@ -349,6 +356,7 @@ export class CircuitSystem extends createSystem({
       this.applyLed();
       playSfx('grab');
       this.setMsg('LED flipped');
+      learning.action('circuit', 'flip_led');
       return;
     }
     if (this.selected < 0) {
@@ -379,6 +387,7 @@ export class CircuitSystem extends createSystem({
     this.rebuildWires();
     playSfx('grab');
     this.setMsg(`Wire added (${this.wires.length})`);
+    learning.action('circuit', 'add_wire');
   }
 
   /** Wires: an arched tube per wire (rebuilt only when wires change), so long wires clear the parts. */
@@ -408,7 +417,7 @@ export class CircuitSystem extends createSystem({
    * (each part entered at one terminal, left at the other). Wires join terminals
    * into nets.
    */
-  private check(): { ok: boolean; msg: string } {
+  private check(): { ok: boolean; msg: string; code?: MistakeCode<'circuit'>; detail?: string } {
     const parent = [0, 1, 2, 3, 4, 5, 6, 7];
     const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])));
     for (const [a, b] of this.wires) parent[find(a)] = find(b);
@@ -438,14 +447,20 @@ export class CircuitSystem extends createSystem({
     };
     walk(net(T_BAT_PLUS));
 
-    if (paths.length === 0) return { ok: false, msg: "The circuit isn't closed" };
+    if (paths.length === 0) return { ok: false, msg: "The circuit isn't closed", code: 'OPEN_LOOP' };
     const withLed = paths.filter((p) => p.comps.has('led'));
-    if (withLed.length === 0) return { ok: false, msg: 'Put the LED in the loop' };
+    if (withLed.length === 0) {
+      // A loop with neither LED nor resistor goes straight from + to -: a short circuit.
+      const short = paths.some((p) => !p.comps.has('resistor'));
+      return short
+        ? { ok: false, msg: 'Put the LED in the loop', code: 'SHORT_CIRCUIT' }
+        : { ok: false, msg: 'Put the LED in the loop', code: 'OPEN_LOOP', detail: 'led_not_in_loop' };
+    }
     const forward = withLed.filter((p) => p.ledForward);
-    if (forward.length === 0) return { ok: false, msg: 'Flip the LED' };
+    if (forward.length === 0) return { ok: false, msg: 'Flip the LED', code: 'LED_REVERSED' };
     const safe = forward.filter((p) => p.comps.has('resistor'));
-    if (safe.length === 0) return { ok: false, msg: 'Add a resistor to protect the LED' };
-    if (!safe.some((p) => p.comps.has('switch'))) return { ok: false, msg: 'Add the switch to the loop' };
+    if (safe.length === 0) return { ok: false, msg: 'Add a resistor to protect the LED', code: 'NO_RESISTOR' };
+    if (!safe.some((p) => p.comps.has('switch'))) return { ok: false, msg: 'Add the switch to the loop', code: 'NO_SWITCH' };
     return { ok: true, msg: 'It lights up!' };
   }
 
@@ -455,12 +470,15 @@ export class CircuitSystem extends createSystem({
     this.setLever(true);
     const result = this.check();
     this.setMsg(result.msg);
+    learning.action('circuit', 'power');
     if (!result.ok) {
+      if (result.code) learning.mistake('circuit', result.code, result.detail);
       playSfx('wrong');
       this.glow = 0;
       return;
     }
     this.done = true;
+    learning.complete('circuit', mistakeStars(learning.mistakes));
     this.glow = 0.01;
     playSfx('correct');
     ARM_SIGNAL.celebrateUntil = performance.now() / 1000 + 1.2;
