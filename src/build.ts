@@ -21,6 +21,7 @@ import { playSfx } from './sfx.js';
 import { MISTAKE } from './core/events.js';
 import { mistakeStars } from './core/stars.js';
 import { learning, modeOf } from './learning.js';
+import { WEB } from './web/state.js';
 
 /**
  * Level 3 Part 2, "Build the robot": pinch a loose part and drop it near its
@@ -95,6 +96,7 @@ export class BuildSystem extends createSystem({
     NAV.startBuild = () => this.start();
     NAV.stopBuild = () => this.stop();
     this.queries.held.subscribe('disqualify', (e) => this.onRelease(e));
+    WEB.onBuildDrop = (e) => this.onRelease(e);
   }
 
   private phase(): number {
