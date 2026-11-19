@@ -19,15 +19,16 @@ import { ARM_SIGNAL, LAYOUT, placeGamePanel, toWorld } from './lab.js';
 import { NAV, PHASE_PROGRAM } from './nav.js';
 import { markLevelDone } from './progress.js';
 import { playSfx } from './sfx.js';
-import { MISTAKE } from './core/events.js';
-import { programStars } from './core/stars.js';
+import { CHALLENGES, GRID_SIZE as GRID, MAX_BLOCKS } from './core/program/challenges.js';
+import { programActivity, type Block, type ProgramState, type Step } from './core/program/program.js';
+import { reportRun } from './core/program/report.js';
 import { learning, modeOf } from './learning.js';
 
 /**
- * Level 2, "Program the robot": build a program from blocks (FORWARD, BACK, LEFT,
- * RIGHT, x2 = repeat the previous block once more), then RUN it. A small command
- * interpreter steps a wheeled robot over a 4x4 grid on the mat; it stops with a
- * bump at the grid edge, and succeeds when it reaches the star.
+ * Level 2, "Program the robot" (spec: docs/activities/program.md). The rules live in
+ * src/core/program: this system turns presses into core inputs, animates the steps the
+ * core returns over a 5x5 grid with obstacles, and reports each RUN with reportRun().
+ * Blocks: FORWARD, BACK, LEFT, RIGHT, REPEAT n (press REPEAT again to cycle n = 2, 3, 4).
  */
 type Cmd = 'fwd' | 'back' | 'left' | 'right' | 'rep';
 const CMDS: Cmd[] = ['fwd', 'back', 'left', 'right', 'rep'];
@@ -38,30 +39,42 @@ const CMD_COLOR: Record<Cmd, string> = {
   right: '#7c4fd0',
   rep: '#d9822b',
 };
-const MAX_BLOCKS = 8;
-const GRID = 4;
-const TILE = 0.075;
-/** Grid corner in table-local metres (front half of the mat, clear of the arm). */
+/** 5 tiles of 6 cm keep the baseline 4 x 7.5 cm footprint (front half of the mat, clear of the arm). */
+const TILE = 0.06;
+/** Grid corner in table-local metres. */
 const GRID_X0 = -0.23;
 const GRID_Z0 = -0.1;
 const STEP_SECONDS = 0.45;
+const MAX_OBSTACLES = Math.max(...CHALLENGES.map((c) => c.obstacles.length));
 
-/** Directions: 0 = away from the player (-Z), 1 = right (+X), 2 = toward player, 3 = left. */
+/** Directions (as in the core): 0 = away from the player (-Z), 1 = right (+X), 2 = toward player, 3 = left. */
 const DIR_DC = [0, 1, 0, -1];
 const DIR_DR = [-1, 0, 1, 0];
 
-type Challenge = { start: [number, number, number]; goal: [number, number]; text: string };
-/** (column, row, direction); rows count from the far edge (0) to the near edge (3). */
-const CHALLENGES: Challenge[] = [
-  { start: [1, 3, 0], goal: [1, 1], text: 'Drive to the star' },
-  { start: [0, 3, 0], goal: [2, 2], text: 'Turn to reach the star' },
-  { start: [0, 3, 1], goal: [3, 0], text: 'Long way? Try x2!' },
-];
+/**
+ * On-screen text, max 5 words each. TODO(i18n): move to src/shell/i18n.ts (en + sw) once it exists.
+ */
+const TEXT = {
+  challenge: [
+    'Drive to the star',
+    'Turn to reach the star',
+    'Go around the block',
+    'Long road? Try REPEAT!',
+    'Use REPEAT around the wall',
+  ],
+  empty: 'Add blocks first.',
+  wall: 'Bump! Edge of the grid.',
+  obstacle: 'Bump! Square is blocked.',
+  missed: 'Not there yet. Try again!',
+  solved: 'You did it!',
+  overPar: 'Solved! Fewer blocks?',
+};
 
 type UIElement = NonNullable<ReturnType<UIKitMLAsset['getElementById']>>;
-type Step = { cmd: Exclude<Cmd, 'rep'>; block: number };
 
 const topMat = new MeshStandardMaterial({ color: 0xf08a24, roughness: 0.45 });
+const obstacleMat = new MeshStandardMaterial({ color: 0x8d5a3b, roughness: 0.7 });
+const obstacleGeo = new BoxGeometry(TILE * 0.8, 0.03, TILE * 0.8);
 const wheelMat = new MeshStandardMaterial({ color: 0x30343c, roughness: 0.8 });
 const eyeMat = new MeshStandardMaterial({ color: 0x9be7ff, emissive: 0x4fc3f7, emissiveIntensity: 1.2 });
 const starMat = new MeshBasicMaterial({ color: 0xf5c542 });
@@ -78,7 +91,7 @@ function starGeometry(outer: number, inner: number): ShapeGeometry {
 }
 
 function gridTexture(): CanvasTexture {
-  const size = 256;
+  const size = 320;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -98,6 +111,11 @@ function gridTexture(): CanvasTexture {
   return new CanvasTexture(canvas);
 }
 
+function uiCmd(block: Block | undefined): Cmd | undefined {
+  if (!block) return undefined;
+  return block.cmd === 'repeat' ? 'rep' : block.cmd;
+}
+
 export class ProgramSystem extends createSystem({
   game: { required: [GameState] },
 }) {
@@ -106,30 +124,30 @@ export class ProgramSystem extends createSystem({
   private lastPress: Record<string, number> = {};
   /** Ignore presses until this time: the poke that opened the view must not add a block. */
   private readyAt = 0;
-  private program: Cmd[] = [];
   private challenge = 0;
+  /** Core state (blocks, tries, stars, last run). */
+  private state: ProgramState = programActivity.init(0);
   private running = false;
   private steps: Step[] = [];
   private stepIndex = 0;
   private stepT = 0;
-  /** Robot state: column, row, direction (0..3). */
+  /** Robot pose being animated: column, row, direction (0..3), and continuous yaw. */
   private col = 0;
   private row = 0;
   private dir = 0;
+  private yaw = 0;
   private from = { x: 0, z: 0, yaw: 0 };
   private to = { x: 0, z: 0, yaw: 0 };
   private bumping = false;
   private flash = 0;
   private flashGreen = false;
   private finishIn = -1;
-  private success = false;
-  /** RUN presses for the current challenge (first-try star). */
-  private runs = 0;
   private time = 0;
   // Scene objects (created on start, disposed on stop).
   private root?: Entity;
   private robot?: Group;
   private star?: Mesh;
+  private obstacles: Mesh[] = [];
   private robotBody?: MeshStandardMaterial;
 
   init(): void {
@@ -169,20 +187,20 @@ export class ProgramSystem extends createSystem({
       ...CMDS.map((c) => `cmd-${c}`),
     ];
     for (let i = 0; i < MAX_BLOCKS; i++) {
-      ids.push(`slot-${i}`);
+      ids.push(`slot-${i}`, `slot-${i}-n`);
       for (const c of CMDS) ids.push(`slot-${i}-${c}`);
     }
     for (const id of ids) this.ui[id] = panel.getElementById(id) ?? undefined;
     for (const c of CMDS) this.bind(`cmd-${c}`, () => this.add(c));
     this.bind('prog-undo', () => {
       if (this.running) return;
-      this.program.pop();
+      this.state = programActivity.apply(this.state, { type: 'remove' });
       this.renderProgram(-1);
       learning.action('program', 'undo');
     });
     this.bind('prog-clear', () => {
       if (this.running) return;
-      this.program.length = 0;
+      this.state = programActivity.apply(this.state, { type: 'clear' });
       this.renderProgram(-1);
       this.placeRobotAtStart();
       learning.action('program', 'clear');
@@ -212,6 +230,7 @@ export class ProgramSystem extends createSystem({
     this.root = undefined;
     this.robot = undefined;
     this.star = undefined;
+    this.obstacles = [];
   }
 
   private buildScene(): void {
@@ -229,9 +248,17 @@ export class ProgramSystem extends createSystem({
     grid.position.set(GRID_X0 + (GRID * TILE) / 2, 0.003, GRID_Z0 + (GRID * TILE) / 2);
     root.add(grid);
 
-    const star = new Mesh(starGeometry(0.03, 0.013), starMat);
+    const star = new Mesh(starGeometry(0.025, 0.011), starMat);
     root.add(star);
     this.star = star;
+
+    // Obstacles: one shared geometry + material; unused ones are hidden per challenge.
+    for (let i = 0; i < MAX_OBSTACLES; i++) {
+      const block = new Mesh(obstacleGeo, obstacleMat);
+      block.visible = false;
+      root.add(block);
+      this.obstacles.push(block);
+    }
 
     const robot = new Group();
     this.robotBody = new MeshStandardMaterial({ color: 0xf3f1ec, roughness: 0.5 });
@@ -251,6 +278,7 @@ export class ProgramSystem extends createSystem({
       eye.position.set(x, 0.026, -0.026);
       robot.add(eye);
     }
+    robot.scale.setScalar(0.85); // fits a 6 cm tile
     root.add(robot);
     this.robot = robot;
 
@@ -273,45 +301,73 @@ export class ProgramSystem extends createSystem({
     this.challenge = i;
     this.readyAt = performance.now() + 600;
     const ch = CHALLENGES[i];
-    this.program.length = 0;
-    this.success = false;
+    this.state = programActivity.init(i);
     this.ui['prog-title']?.setProperties({ text: `CHALLENGE ${i + 1}/${CHALLENGES.length}` });
-    this.ui['prog-instr']?.setProperties({ text: ch.text });
+    this.ui['prog-instr']?.setProperties({ text: TEXT.challenge[i] });
     this.ui['prog-edit']?.setProperties({ display: 'flex' });
     this.ui['prog-done']?.setProperties({ display: 'none' });
-    this.star?.position.set(this.tileX(ch.goal[0]), 0.006, this.tileZ(ch.goal[1]));
+    this.star?.position.set(this.tileX(ch.goal.col), 0.006, this.tileZ(ch.goal.row));
+    this.obstacles.forEach((block, k) => {
+      const cell = ch.obstacles[k];
+      block.visible = cell !== undefined;
+      if (cell) block.position.set(this.tileX(cell[0]), 0.018, this.tileZ(cell[1]));
+    });
     this.renderProgram(-1);
     this.placeRobotAtStart();
-    this.runs = 0;
     learning.start('program', i, modeOf(this.world));
   }
 
   private placeRobotAtStart(): void {
-    const [c, r, d] = CHALLENGES[this.challenge].start;
-    this.col = c;
-    this.row = r;
-    this.dir = d;
+    const { col, row, dir } = CHALLENGES[this.challenge].start;
+    this.col = col;
+    this.row = row;
+    this.dir = dir;
+    this.yaw = this.dirYaw(dir);
     this.running = false;
     this.finishIn = -1;
-    this.robot?.position.set(this.tileX(c), 0.004, this.tileZ(r));
-    this.robot?.rotation.set(0, this.dirYaw(d), 0);
+    this.robot?.position.set(this.tileX(col), 0.004, this.tileZ(row));
+    this.robot?.rotation.set(0, this.yaw, 0);
   }
 
+  /** REPEAT right after REPEAT cycles its count 2 -> 3 -> 4 -> 2 instead of adding a block. */
   private add(c: Cmd): void {
-    if (this.running || this.program.length >= MAX_BLOCKS) return;
-    this.program.push(c);
+    if (this.running) return;
+    const blocks = this.state.blocks;
+    const last = blocks[blocks.length - 1];
+    let next: ProgramState;
+    let name: string;
+    if (c === 'rep' && last?.cmd === 'repeat') {
+      const n = last.n === 4 ? 2 : ((last.n + 1) as 3 | 4);
+      next = programActivity.apply(programActivity.apply(this.state, { type: 'remove' }), {
+        type: 'add',
+        block: { cmd: 'repeat', n },
+      });
+      name = `repeat_${n}`;
+    } else {
+      const block: Block = c === 'rep' ? { cmd: 'repeat', n: 2 } : { cmd: c };
+      next = programActivity.apply(this.state, { type: 'add', block });
+      name = c === 'rep' ? 'add_repeat' : `add_${c}`;
+    }
+    if (next === this.state) return; // full (8 blocks)
+    this.state = next;
     playSfx('grab');
-    learning.action('program', `add_${c}`);
+    learning.action('program', name);
     this.renderProgram(-1);
   }
 
-  /** Program row: each slot shows its block's icon on its colour; `active` is outlined. */
+  /** Program row: each slot shows its block's icon (or "xN" for REPEAT) on its colour; `active` is outlined. */
   private renderProgram(active: number): void {
     for (let i = 0; i < MAX_BLOCKS; i++) {
-      const cmd = this.program[i];
+      const block = this.state.blocks[i];
+      const cmd = uiCmd(block);
       for (const c of CMDS) {
-        this.ui[`slot-${i}-${c}`]?.setProperties({ display: c === cmd ? 'flex' : 'none' });
+        // REPEAT shows its count text instead of the icon (falls back to the icon if the panel lacks slot-N-n).
+        const show = c === cmd && !(c === 'rep' && this.ui[`slot-${i}-n`]);
+        this.ui[`slot-${i}-${c}`]?.setProperties({ display: show ? 'flex' : 'none' });
       }
+      this.ui[`slot-${i}-n`]?.setProperties(
+        block?.cmd === 'repeat' ? { display: 'flex', text: `x${block.n}` } : { display: 'none' },
+      );
       this.ui[`slot-${i}`]?.setProperties({
         backgroundColor: cmd ? CMD_COLOR[cmd] : '#2b2e35',
         borderColor: i === active ? '#ffe066' : cmd ? CMD_COLOR[cmd] : '#3a3d45',
@@ -319,31 +375,18 @@ export class ProgramSystem extends createSystem({
     }
   }
 
-  /** Expand blocks into steps: x2 repeats the previous (non-x2) block once more. */
-  private compile(): Step[] {
-    const steps: Step[] = [];
-    let prev: Exclude<Cmd, 'rep'> | undefined;
-    this.program.forEach((c, block) => {
-      if (c === 'rep') {
-        if (prev) steps.push({ cmd: prev, block });
-      } else {
-        prev = c;
-        steps.push({ cmd: c, block });
-      }
-    });
-    return steps;
-  }
-
   private run(): void {
-    if (this.running) return;
-    if (this.program.length === 0) {
-      learning.mistake('program', MISTAKE.EMPTY_PROGRAM);
+    if (this.running || this.finishIn >= 0) return;
+    this.state = programActivity.apply(this.state, { type: 'run' });
+    const result = this.state.lastRun?.result;
+    if (!result) {
+      // Empty program: nothing to animate.
+      this.ui['prog-instr']?.setProperties({ text: TEXT.empty });
+      reportRun(learning, this.state);
       return;
     }
-    this.runs++;
-    learning.action('program', 'run');
     this.placeRobotAtStart();
-    this.steps = this.compile();
+    this.steps = result.steps;
     this.stepIndex = -1;
     this.running = true;
     this.nextStep();
@@ -352,46 +395,51 @@ export class ProgramSystem extends createSystem({
   private nextStep(): void {
     this.stepIndex++;
     if (this.stepIndex >= this.steps.length) {
-      this.running = false;
-      this.renderProgram(-1);
-      if (!this.success) {
-        this.ui['prog-instr']?.setProperties({ text: 'Not there yet. Try again!' });
-        learning.mistake('program', MISTAKE.MISSED_GOAL);
-      }
+      this.finishRun();
       return;
     }
     const step = this.steps[this.stepIndex];
     this.renderProgram(step.block);
     this.from.x = this.tileX(this.col);
     this.from.z = this.tileZ(this.row);
-    this.from.yaw = this.dirYaw(this.dir);
-    this.to.x = this.from.x;
-    this.to.z = this.from.z;
-    this.to.yaw = this.from.yaw;
-    this.bumping = false;
+    this.from.yaw = this.yaw;
+    this.to.x = this.tileX(step.pose.col);
+    this.to.z = this.tileZ(step.pose.row);
+    this.to.yaw = this.yaw;
+    this.bumping = step.bump !== undefined;
     if (step.cmd === 'left' || step.cmd === 'right') {
-      this.dir = (this.dir + (step.cmd === 'right' ? 1 : 3)) % 4;
-      this.to.yaw = this.from.yaw + (step.cmd === 'right' ? -1 : 1) * (Math.PI / 2);
-    } else {
+      this.to.yaw = this.yaw + (step.cmd === 'right' ? -1 : 1) * (Math.PI / 2);
+    } else if (this.bumping) {
+      // Edge or obstacle: nudge toward it a little and back, then stop.
       const sign = step.cmd === 'fwd' ? 1 : -1;
-      const c = this.col + sign * DIR_DC[this.dir];
-      const r = this.row + sign * DIR_DR[this.dir];
-      if (c < 0 || c >= GRID || r < 0 || r >= GRID) {
-        // Grid edge: nudge out a little and back, then stop.
-        this.bumping = true;
-        this.to.x = this.from.x + sign * DIR_DC[this.dir] * TILE * 0.3;
-        this.to.z = this.from.z + sign * DIR_DR[this.dir] * TILE * 0.3;
-        playSfx('wrong');
-        this.flash = 1;
-        this.flashGreen = false;
-      } else {
-        this.col = c;
-        this.row = r;
-        this.to.x = this.tileX(c);
-        this.to.z = this.tileZ(r);
-      }
+      this.to.x = this.from.x + sign * DIR_DC[this.dir] * TILE * 0.3;
+      this.to.z = this.from.z + sign * DIR_DR[this.dir] * TILE * 0.3;
+      playSfx('wrong');
+      this.flash = 1;
+      this.flashGreen = false;
     }
     this.stepT = 0;
+  }
+
+  /** Animation done: show the outcome, then send the run's events (so Robo's hint lands with the bump). */
+  private finishRun(): void {
+    this.running = false;
+    this.renderProgram(-1);
+    const run = this.state.lastRun;
+    const outcome = run?.result?.outcome;
+    if (outcome === 'solved') {
+      playSfx('correct');
+      this.flash = 1;
+      this.flashGreen = true;
+      ARM_SIGNAL.celebrateUntil = performance.now() / 1000 + 1.2;
+      const overPar = run?.mistake?.code === 'TOO_MANY_BLOCKS';
+      this.ui['prog-instr']?.setProperties({ text: overPar ? TEXT.overPar : TEXT.solved });
+      this.finishIn = 1.0;
+    } else {
+      const text = outcome === 'HIT_WALL' ? TEXT.wall : outcome === 'HIT_OBSTACLE' ? TEXT.obstacle : TEXT.missed;
+      this.ui['prog-instr']?.setProperties({ text });
+    }
+    reportRun(learning, this.state);
   }
 
   update(delta: number): void {
@@ -402,7 +450,7 @@ export class ProgramSystem extends createSystem({
       this.star.rotation.y = this.time * 1.2;
       this.star.position.y = 0.008 + Math.sin(this.time * 3) * 0.003;
     }
-    // Red bump flash on the robot body.
+    // Bump (red) / success (green) flash on the robot body.
     if (this.flash > 0 && this.robotBody) {
       this.flash = Math.max(0, this.flash - delta * 1.5);
       const f = 0.7 * this.flash;
@@ -419,32 +467,19 @@ export class ProgramSystem extends createSystem({
     this.stepT += delta / STEP_SECONDS;
     const t = Math.min(1, this.stepT);
     const k = this.bumping ? Math.sin(Math.PI * t) : t * t * (3 - 2 * t);
-    const x = this.bumping ? this.from.x + (this.to.x - this.from.x) * k : this.from.x + (this.to.x - this.from.x) * k;
-    const z = this.bumping ? this.from.z + (this.to.z - this.from.z) * k : this.from.z + (this.to.z - this.from.z) * k;
+    const x = this.from.x + (this.to.x - this.from.x) * k;
+    const z = this.from.z + (this.to.z - this.from.z) * k;
     this.robot.position.set(x, 0.004 + (this.bumping ? 0 : Math.sin(Math.PI * t) * 0.006), z);
     this.robot.rotation.y = this.from.yaw + (this.to.yaw - this.from.yaw) * (this.bumping ? 0 : k);
     if (t < 1) return;
 
-    if (this.bumping) {
-      this.running = false;
-      this.renderProgram(-1);
-      this.ui['prog-instr']?.setProperties({ text: 'Bump! Edge of the grid.' });
-      learning.mistake('program', MISTAKE.HIT_WALL);
-      return;
-    }
-    const goal = CHALLENGES[this.challenge].goal;
-    if (this.col === goal[0] && this.row === goal[1]) {
-      this.running = false;
-      this.success = true;
-      this.renderProgram(-1);
-      playSfx('correct');
-      this.flash = 1;
-      this.flashGreen = true;
-      ARM_SIGNAL.celebrateUntil = performance.now() / 1000 + 1.2;
-      this.ui['prog-instr']?.setProperties({ text: 'You did it!' });
-      learning.complete('program', programStars(this.program.length, this.runs));
-      this.finishIn = 1.0;
-      return;
+    // Step finished: take the pose the core computed.
+    const step = this.steps[this.stepIndex];
+    if (!this.bumping) {
+      this.col = step.pose.col;
+      this.row = step.pose.row;
+      this.dir = step.pose.dir;
+      this.yaw = this.to.yaw;
     }
     this.nextStep();
   }

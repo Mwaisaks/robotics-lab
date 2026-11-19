@@ -42,3 +42,6 @@ pids/
 .cursor/mcp.json
 .vscode/mcp.json
 .codex/config.toml
+
+# Local test output (screenshots, recordings)
+artifacts/
