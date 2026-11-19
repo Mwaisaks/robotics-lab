@@ -24,8 +24,9 @@ export type LearningEvent =
     };
 
 /**
- * Mistake codes. Code always uses MISTAKE.X, so renaming a code is a one-line
- * change to its value here. The activity specs in docs/activities/ own the list.
+ * Mistake codes. Source of truth: docs/activities/mistake-codes.md (Joshua);
+ * tests/core/events.test.ts checks this file against it. Code always uses
+ * MISTAKE.X, so renaming a code is a one-line change to its value here.
  */
 export const MISTAKE = {
   // Level 1, Sort the parts
@@ -36,6 +37,7 @@ export const MISTAKE = {
   HIT_WALL: 'HIT_WALL',
   HIT_OBSTACLE: 'HIT_OBSTACLE',
   MISSED_GOAL: 'MISSED_GOAL',
+  WRONG_TURN: 'WRONG_TURN',
   TOO_MANY_BLOCKS: 'TOO_MANY_BLOCKS',
   EMPTY_PROGRAM: 'EMPTY_PROGRAM',
   // Level 3, Light it up
@@ -45,6 +47,7 @@ export const MISTAKE = {
   SHORT_CIRCUIT: 'SHORT_CIRCUIT',
   LED_NOT_IN_LOOP: 'LED_NOT_IN_LOOP',
   SWITCH_NOT_IN_LOOP: 'SWITCH_NOT_IN_LOOP',
+  SWITCH_OFF: 'SWITCH_OFF',
   // Level 3 Part 2, Build the robot
   WRONG_SLOT: 'WRONG_SLOT',
   // P2, Control the arm
@@ -59,6 +62,7 @@ export const MISTAKE_CODES = {
     MISTAKE.HIT_WALL,
     MISTAKE.HIT_OBSTACLE,
     MISTAKE.MISSED_GOAL,
+    MISTAKE.WRONG_TURN,
     MISTAKE.TOO_MANY_BLOCKS,
     MISTAKE.EMPTY_PROGRAM,
   ],
@@ -69,6 +73,7 @@ export const MISTAKE_CODES = {
     MISTAKE.SHORT_CIRCUIT,
     MISTAKE.LED_NOT_IN_LOOP,
     MISTAKE.SWITCH_NOT_IN_LOOP,
+    MISTAKE.SWITCH_OFF,
   ],
   build: [MISTAKE.WRONG_SLOT],
   arm: [MISTAKE.TARGET_UNREACHABLE, MISTAKE.JOINT_LIMIT],
