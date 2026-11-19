@@ -53,19 +53,19 @@ describe('startTutor', () => {
     }
   });
 
-  it('ignores an AI answer that arrives after 3 s', async () => {
+  it('ignores an AI answer that arrives after 6 s', async () => {
     vi.useFakeTimers();
-    const { shown, mistake } = setup(() => new Promise((r) => setTimeout(() => r('Too late.'), 3500)));
+    const { shown, mistake } = setup(() => new Promise((r) => setTimeout(() => r('Too late.'), 6500)));
     mistake();
-    await vi.advanceTimersByTimeAsync(3500);
+    await vi.advanceTimersByTimeAsync(6500);
     expect(shown.map((s) => s[1])).toEqual(['builtin']);
   });
 
-  it('uses an AI answer that arrives just inside 3 s', async () => {
+  it('uses an AI answer that arrives just inside 6 s', async () => {
     vi.useFakeTimers();
-    const { shown, mistake } = setup(() => new Promise((r) => setTimeout(() => r('Just in time.'), 2900)));
+    const { shown, mistake } = setup(() => new Promise((r) => setTimeout(() => r('Just in time.'), 5900)));
     mistake();
-    await vi.advanceTimersByTimeAsync(2900);
+    await vi.advanceTimersByTimeAsync(5900);
     expect(shown[shown.length - 1]).toEqual(['Just in time.', 'ai']);
   });
 
@@ -188,7 +188,7 @@ describe('fetchAiHint', () => {
     expect(await fetchAiHint(req, { fetchFn: async () => { throw new TypeError('Failed to fetch'); } })).toBeNull();
   });
 
-  it('gives up after 3 s and aborts the request', async () => {
+  it('gives up after 6 s and aborts the request', async () => {
     vi.useFakeTimers();
     let signal: AbortSignal | undefined;
     const fetchFn = (_u: RequestInfo | URL, init?: RequestInit) =>
@@ -197,7 +197,9 @@ describe('fetchAiHint', () => {
         signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
       });
     const pending = fetchAiHint(req, { fetchFn: fetchFn as typeof fetch });
-    await vi.advanceTimersByTimeAsync(3000);
+    await vi.advanceTimersByTimeAsync(5999);
+    expect(signal?.aborted).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
     expect(await pending).toBeNull();
     expect(signal?.aborted).toBe(true);
   });

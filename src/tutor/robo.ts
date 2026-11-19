@@ -1,7 +1,7 @@
 /**
  * Robo, the tutor hook. Listens to the learning-event bus and, on every mistake:
  * 1. shows the built-in hint at once (offline-safe) and emits hint_shown 'builtin';
- * 2. asks /api/hint in the background; if an AI answer arrives within 3 s and no
+ * 2. asks /api/hint in the background; if an AI answer arrives within 6 s and no
  *    newer mistake has happened, replaces the text and emits hint_shown 'ai'.
  * Attempts are counted per activity+code (reset when that activity starts again).
  *
@@ -10,7 +10,7 @@
  */
 import { events as appEvents, type ActivityId, type EventBus } from '../core/events.js';
 import { fetchAiHint } from './ai-client.js';
-import { HINT_TIMEOUT_MS } from './ai-hint.js';
+import { CLIENT_HINT_TIMEOUT_MS } from './ai-hint.js';
 import { builtinHint, type HintRequest, type Lang } from './hints.js';
 import { showHintBox } from './hint-box.js';
 
@@ -44,7 +44,7 @@ export function startTutor({
   bus = appEvents,
   fetchHint = (req) => fetchAiHint(req),
   now = Date.now,
-  aiTimeoutMs = HINT_TIMEOUT_MS,
+  aiTimeoutMs = CLIENT_HINT_TIMEOUT_MS,
 }: TutorOptions): Tutor {
   const getLang = typeof lang === 'function' ? lang : () => lang;
   const draw: ShowHint = show ?? ((text, source) => showHintBox(text, source, getLang()));
