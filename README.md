@@ -1,4 +1,16 @@
-# IWSDK App
+# Robotics Lab
+
+## Prior work
+
+This project starts from our Robot Arm Lab prototype, built on 18 Nov 2026 for another competition. Everything listed under 'Built at MksU Hackfest' was built on 19-20 Nov 2026.
+
+The prototype is the commit tagged `baseline`.
+
+## Built at MksU Hackfest
+
+-
+
+## Setup
 
 This project uses `iwsdk.config.json` for declarative scene, asset, component,
 XR, and emulator configuration. Application systems remain explicit in
