@@ -63,10 +63,10 @@ REPEAT (the shortest program without it is 11 blocks; the limit is 8).
 | --- | --- | --- | --- |
 | `HIT_WALL` | A move would leave the grid | The robot hit the edge. Count the squares before you move forward. | Roboti imegonga ukingo. Hesabu miraba kabla ya kusonga mbele. |
 | `HIT_OBSTACLE` | A move would enter a blocked square | Something is in the way. Try turning before you move forward. | Kuna kizuizi njiani. Jaribu kugeuka kabla ya kusonga mbele. |
-| `MISSED_GOAL` | Program ended, robot not on the star | Close! The program ended before the star. Add the missing steps. | Karibu! Programu imeisha kabla ya nyota. Ongeza hatua zinazokosekana. |
+| `MISSED_GOAL` | Program ended, robot not on the star | Close! The program ended before the star, so add the missing steps. | Umekaribia! Programu imeisha kabla ya nyota, kwa hiyo ongeza hatua zinazokosekana. |
 | `WRONG_TURN` | Failed run that would solve with LEFT/RIGHT swapped | Left and right are from the robot's view. Look at where its eyes point. | Kushoto na kulia ni kwa mtazamo wa roboti. Angalia macho yake yanaelekea wapi. |
-| `TOO_MANY_BLOCKS` | Solved, but blocks > par | You did it! Can you use REPEAT to do it with fewer blocks? | Umeweza! Je, unaweza kutumia RUDIA ili utumie vipande vichache? |
-| `EMPTY_PROGRAM` | RUN with no blocks | Add some blocks first, then press RUN. | Ongeza vipande kwanza, kisha bonyeza ENDESHA. |
+| `TOO_MANY_BLOCKS` | Solved, but blocks > par | You did it! Can you use REPEAT to do it with fewer blocks? | Umeweza! Je, unaweza kutumia RUDIA (REPEAT) ili utumie vipande vichache? |
+| `EMPTY_PROGRAM` | RUN with no blocks | Add some blocks first, then press RUN. | Ongeza vipande kwanza, kisha bonyeza ENDESHA (RUN). |
 
 UI words for the blocks in Kiswahili come from `src/shell/i18n.ts` (RUDIA = REPEAT, ENDESHA = RUN, per the hints above).
 
