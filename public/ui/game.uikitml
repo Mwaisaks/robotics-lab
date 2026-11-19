@@ -268,6 +268,27 @@
     height: 64px;
     color: #f5c542;
   }
+  .mslot {
+    width: 92px;
+    height: 44px;
+    border-radius: 8px;
+    border-width: 3px;
+    border-color: #3a3d45;
+    background-color: #2b2e35;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mslot-text {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .dist-button {
+    height: 62px;
+    justify-content: center;
+  }
 </style>
 <Panel class="panel-root">
   <div id="menu-view" class="view">
@@ -284,6 +305,9 @@
     <Button id="level3-button" class="level-button">
       <ButtonLabel class="level-label">3  LIGHT IT UP</ButtonLabel>
       <ButtonIcon><Check id="tick-3" class="tick" style="display: none"></Check></ButtonIcon>
+    </Button>
+    <Button id="level4-button" class="level-button">
+      <ButtonLabel id="level4-label" class="level-label">4  MICROCONTROLLER</ButtonLabel>
     </Button>
     <Button id="exit-button-menu" class="button-small" variant="secondary">
       <ButtonLabel class="button-small-label">EXIT</ButtonLabel>
@@ -570,6 +594,110 @@
       <div class="heading">Robot built!</div>
       <div class="body">Your robot drove its first path.</div>
       <Button id="menu-button-build-done" class="button-small" variant="secondary">
+        <ButtonLabel class="button-small-label">MENU</ButtonLabel>
+      </Button>
+    </div>
+  </div>
+  <div id="micro-view" class="view" style="display: none">
+    <div class="prog-head">
+      <div id="micro-step" class="stat-label">LEVEL 4  STEP 1/3</div>
+      <Button id="menu-button-micro" class="button-tiny" variant="secondary">
+        <ButtonLabel class="button-tiny-label">MENU</ButtonLabel>
+      </Button>
+    </div>
+    <div class="tut-sub">Simplified microcontroller model</div>
+    <div id="micro-msg" class="prog-instr">Wire the LED and sensor</div>
+    <div id="micro-wire" class="prog-col">
+      <div class="tut-step-row">
+        <Pointer class="step-icon"></Pointer>
+        <div class="step-text">Pinch two dots: a wire</div>
+      </div>
+      <div class="tut-step-row">
+        <Lightbulb class="step-icon"></Lightbulb>
+        <div class="step-text">LED + to D13, - to GND</div>
+      </div>
+      <div class="tut-step-row">
+        <Zap class="step-icon"></Zap>
+        <div class="step-text">VCC 5V, TRIG D7, ECHO D8</div>
+      </div>
+      <div class="row-buttons">
+        <Button id="micro-undo" class="cmd grow" variant="secondary">
+          <ButtonIcon><Undo2></Undo2></ButtonIcon>
+          <ButtonLabel class="cmd-label">UNDO</ButtonLabel>
+        </Button>
+        <Button id="micro-clear" class="cmd grow" variant="secondary">
+          <ButtonIcon><Trash2></Trash2></ButtonIcon>
+          <ButtonLabel class="cmd-label">CLEAR</ButtonLabel>
+        </Button>
+        <Button id="micro-power" class="cmd grow">
+          <ButtonIcon><Power></Power></ButtonIcon>
+          <ButtonLabel class="cmd-label">POWER</ButtonLabel>
+        </Button>
+      </div>
+    </div>
+    <div id="micro-prog" class="prog-col" style="display: none">
+      <div class="slots">
+        <div id="micro-slot-0" class="mslot"><div id="micro-slot-0-t" class="mslot-text"></div></div>
+        <div id="micro-slot-1" class="mslot"><div id="micro-slot-1-t" class="mslot-text"></div></div>
+        <div id="micro-slot-2" class="mslot"><div id="micro-slot-2-t" class="mslot-text"></div></div>
+        <div id="micro-slot-3" class="mslot"><div id="micro-slot-3-t" class="mslot-text"></div></div>
+      </div>
+      <div class="row-buttons">
+        <Button id="micro-b-if_near" class="cmd grow">
+          <ButtonLabel class="cmd-label">IF NEAR</ButtonLabel>
+        </Button>
+        <Button id="micro-b-led_on" class="cmd grow">
+          <ButtonLabel class="cmd-label">LED ON</ButtonLabel>
+        </Button>
+      </div>
+      <div class="row-buttons">
+        <Button id="micro-b-else" class="cmd grow">
+          <ButtonLabel class="cmd-label">ELSE</ButtonLabel>
+        </Button>
+        <Button id="micro-b-led_off" class="cmd grow">
+          <ButtonLabel class="cmd-label">LED OFF</ButtonLabel>
+        </Button>
+      </div>
+      <div class="row-buttons">
+        <Button id="micro-p-undo" class="cmd grow" variant="secondary">
+          <ButtonIcon><Undo2></Undo2></ButtonIcon>
+          <ButtonLabel class="cmd-label">UNDO</ButtonLabel>
+        </Button>
+        <Button id="micro-p-clear" class="cmd grow" variant="secondary">
+          <ButtonIcon><Trash2></Trash2></ButtonIcon>
+          <ButtonLabel class="cmd-label">CLEAR</ButtonLabel>
+        </Button>
+        <Button id="micro-run" class="cmd grow">
+          <ButtonIcon><Play></Play></ButtonIcon>
+          <ButtonLabel class="cmd-label">RUN</ButtonLabel>
+        </Button>
+      </div>
+    </div>
+    <div id="micro-test" class="prog-col" style="display: none">
+      <div id="micro-dist" class="step-text">Distance: 40 cm  LED: OFF</div>
+      <div class="tut-sub">DISTANCE (cm)</div>
+      <div class="row-buttons">
+        <Button id="micro-d-0" class="dist-button grow" variant="secondary">
+          <ButtonLabel id="micro-d-0-l" class="cmd-label">5</ButtonLabel>
+        </Button>
+        <Button id="micro-d-1" class="dist-button grow" variant="secondary">
+          <ButtonLabel id="micro-d-1-l" class="cmd-label">10</ButtonLabel>
+        </Button>
+        <Button id="micro-d-2" class="dist-button grow" variant="secondary">
+          <ButtonLabel id="micro-d-2-l" class="cmd-label">15</ButtonLabel>
+        </Button>
+        <Button id="micro-d-3" class="dist-button grow" variant="secondary">
+          <ButtonLabel id="micro-d-3-l" class="cmd-label">25</ButtonLabel>
+        </Button>
+        <Button id="micro-d-4" class="dist-button grow" variant="secondary">
+          <ButtonLabel id="micro-d-4-l" class="cmd-label">40</ButtonLabel>
+        </Button>
+      </div>
+    </div>
+    <div id="micro-done" class="prog-col" style="display: none">
+      <div class="heading">Level complete!</div>
+      <div class="body">Your sensor controls the LED.</div>
+      <Button id="menu-button-micro-done" class="button-small" variant="secondary">
         <ButtonLabel class="button-small-label">MENU</ButtonLabel>
       </Button>
     </div>

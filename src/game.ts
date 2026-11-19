@@ -16,6 +16,8 @@ import {
   PHASE_BUILD,
   PHASE_CIRCUIT,
   PHASE_MENU,
+  PHASE_MICRO,
+  MICRO_ENABLED,
   PHASE_PLAYING,
   PHASE_PROGRAM,
   PHASE_TUTORIAL,
@@ -134,9 +136,9 @@ export class GameSystem extends createSystem({
       'time-value', 'score-value', 'feedback', 'result-score', 'result-detail',
       'star-1', 'star-2', 'star-3',
       'howto-button', 'tutorial-view', 'skip-button',
-      'menu-view', 'level1-button', 'level2-button', 'level3-button', 'exit-button-menu',
+      'menu-view', 'level1-button', 'level2-button', 'level3-button', 'level4-button', 'level4-label', 'exit-button-menu',
       'menu-button-start', 'menu-button-result', 'menu-button-play', 'next-level-button',
-      'program-view', 'circuit-view', 'build-view', 'tick-1', 'tick-2', 'tick-3',
+      'program-view', 'circuit-view', 'build-view', 'micro-view', 'tick-1', 'tick-2', 'tick-3',
     ]) {
       this.ui[id] = panel.getElementById(id) ?? undefined;
     }
@@ -163,6 +165,9 @@ export class GameSystem extends createSystem({
       },
       'level3-button': () => {
         if (this.phase() === PHASE_MENU) this.startLevel(3);
+      },
+      'level4-button': () => {
+        if (this.phase() === PHASE_MENU && MICRO_ENABLED) this.startLevel(5);
       },
       'next-level-button': () => {
         if (this.phase() === PHASE_RESULT) this.startLevel(2);
@@ -205,11 +210,12 @@ export class GameSystem extends createSystem({
   }
 
   /** Opens a level from the menu or a NEXT LEVEL button. */
-  startLevel(level: 1 | 2 | 3 | 4): void {
+  startLevel(level: 1 | 2 | 3 | 4 | 5): void {
     const phase = this.phase();
     if (phase === PHASE_PROGRAM) NAV.stopProgram();
     if (phase === PHASE_CIRCUIT) NAV.stopCircuit();
     if (phase === PHASE_BUILD) NAV.stopBuild();
+    if (phase === PHASE_MICRO) NAV.stopMicro();
     this.stopRound();
     if (level === 1) {
       setLabMode(this.world, 'sort');
@@ -219,11 +225,12 @@ export class GameSystem extends createSystem({
     }
     this.fitHeightToPlayer();
     setLabMode(this.world, 'program');
-    const next = level === 2 ? PHASE_PROGRAM : level === 3 ? PHASE_CIRCUIT : PHASE_BUILD;
+    const next = level === 2 ? PHASE_PROGRAM : level === 3 ? PHASE_CIRCUIT : level === 5 ? PHASE_MICRO : PHASE_BUILD;
     this.state.setValue(GameState, 'phase', next);
     this.showView(next);
     if (level === 2) NAV.startProgram();
     else if (level === 3) NAV.startCircuit();
+    else if (level === 5) NAV.startMicro();
     else NAV.startBuild();
   }
 
@@ -245,6 +252,7 @@ export class GameSystem extends createSystem({
     if (phase === PHASE_PROGRAM) NAV.stopProgram();
     if (phase === PHASE_CIRCUIT) NAV.stopCircuit();
     if (phase === PHASE_BUILD) NAV.stopBuild();
+    if (phase === PHASE_MICRO) NAV.stopMicro();
     this.stopRound();
     setLabMode(this.world, 'sort');
     this.state.setValue(GameState, 'phase', PHASE_MENU);
@@ -252,6 +260,8 @@ export class GameSystem extends createSystem({
     for (const level of [1, 2, 3] as const) {
       this.ui[`tick-${level}`]?.setProperties({ display: isLevelDone(level) ? 'flex' : 'none' });
     }
+    this.ui['level4-button']?.setProperties({ display: 'flex' });
+    if (!MICRO_ENABLED) this.ui['level4-label']?.setProperties({ text: '4  COMING SOON' });
   }
 
   private phase(): number {
@@ -267,6 +277,7 @@ export class GameSystem extends createSystem({
     this.ui['program-view']?.setProperties({ display: phase === PHASE_PROGRAM ? 'flex' : 'none' });
     this.ui['circuit-view']?.setProperties({ display: phase === PHASE_CIRCUIT ? 'flex' : 'none' });
     this.ui['build-view']?.setProperties({ display: phase === PHASE_BUILD ? 'flex' : 'none' });
+    this.ui['micro-view']?.setProperties({ display: phase === PHASE_MICRO ? 'flex' : 'none' });
   }
 
   fitHeightToPlayer(): void {

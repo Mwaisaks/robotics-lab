@@ -9,6 +9,9 @@ export const PHASE_MENU = 4;
 export const PHASE_PROGRAM = 5;
 export const PHASE_CIRCUIT = 6;
 export const PHASE_BUILD = 7;
+export const PHASE_MICRO = 8;
+/** Level 4 (Microcontroller lab) switch: false shows "4  COMING SOON" in the menu and the button does nothing. */
+export const MICRO_ENABLED = true;
 
 export const NAV = {
   /** Set by GameSystem: show the level menu. */
@@ -23,8 +26,11 @@ export const NAV = {
   /** Set by BuildSystem: start / clean up Level 3 Part 2. */
   startBuild: (): void => undefined,
   stopBuild: (): void => undefined,
-  /** Set by GameSystem: open a level (NEXT LEVEL buttons). 4 = Level 3 Part 2. */
-  startLevel: (_level: 1 | 2 | 3 | 4): void => undefined,
+  /** Set by MicroSystem: start / clean up Level 4, Microcontroller lab. */
+  startMicro: (): void => undefined,
+  stopMicro: (): void => undefined,
+  /** Set by GameSystem: open a level (NEXT LEVEL buttons). 4 = Level 3 Part 2, 5 = Level 4 (microcontroller). */
+  startLevel: (_level: 1 | 2 | 3 | 4 | 5): void => undefined,
   /** Set by the start screen: browser mode EXIT goes back to it. */
   exitToStart: (): void => undefined,
 };
