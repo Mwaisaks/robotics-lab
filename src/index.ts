@@ -18,6 +18,7 @@ import { PartRespawnSystem } from './part-respawn.js';
 import { ProgramSystem } from './program.js';
 import { TablePlacementSystem } from './table-placement.js';
 import { logEventsIfDebug, modeOf } from './learning.js';
+import { LabEnvironmentSystem } from './shared3d/environment/lab-environment-system.js';
 import { HINT_PANEL, HintPanelSystem } from './shell/hint-panel.js';
 import { getLang } from './shell/i18n.js';
 import { setupStartScreen } from './shell/start-screen.js';
@@ -59,6 +60,7 @@ World.create(
   world.registerSystem(BuildSystem);
   world.registerSystem(BrowserModeSystem);
   world.registerSystem(HintPanelSystem);
+  world.registerSystem(LabEnvironmentSystem);
   // Class code + nickname -> progress sync (setPlayer starts it). Guest: no player, no sync.
   setupStartScreen(world, {
     onPlayer: (player) => (player ? setPlayer(player) : (setPlayer(null), true)),
