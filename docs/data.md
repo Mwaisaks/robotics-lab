@@ -78,9 +78,12 @@ returns rows for the code passed in. The class code is the teacher's shared secr
 (6+ chars), and treat the dashboard as "anyone with the code can see the class" (no PII is stored, by design).
 
 ## How the app uses it
-- **Write** (progress sync, `src/tutor` / sync module): `POST {SUPABASE_URL}/rest/v1/events` with headers
-  `apikey: <anon key>` and `Authorization: Bearer <anon key>`, body = one row or an array of rows.
-  Queue rows in local storage while offline and flush when back online.
+- **Write** (progress sync): `src/tutor/sync.ts` queues rows in localStorage (max 500) and sends batches of 25
+  to `POST /api/progress` when online (after each event, on the `online` event, every 20 s).
+  `api/progress.ts` validates each row (`src/tutor/progress-rows.ts`, same rules as the CHECK constraints),
+  drops invalid rows, and inserts the rest with `POST {SUPABASE_URL}/rest/v1/events`, headers
+  `apikey` + `Authorization: Bearer <anon key>` + `Prefer: return=minimal` (anon can't select).
+  The keys stay in server env; the browser never sees them. `SUPABASE_URL` is the base URL, no `/rest/v1`.
 - **Read** (dashboard): `POST {SUPABASE_URL}/rest/v1/rpc/class_events` with `{ "p_class_code": "ABC123" }`.
   The dashboard computes stars/time per nickname × activity and the top 3 mistake codes.
 
