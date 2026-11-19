@@ -18,6 +18,8 @@ import { ARM_SIGNAL, LAYOUT, placeGamePanel, toWorld } from './lab.js';
 import { NAV, PHASE_BUILD } from './nav.js';
 import { markLevelDone } from './progress.js';
 import { playSfx } from './sfx.js';
+import { mistakeStars } from './core/stars.js';
+import { learning, modeOf } from './learning.js';
 
 /**
  * Level 3 Part 2, "Build the robot": pinch a loose part and drop it near its
@@ -140,9 +142,11 @@ export class BuildSystem extends createSystem({
     this.ui['build-go']?.setProperties({ display: 'none' });
     this.ui['build-edit']?.setProperties({ display: 'flex' });
     this.ui['build-done']?.setProperties({ display: 'none' });
+    learning.start('build', 0, modeOf(this.world));
   }
 
   stop(): void {
+    if (learning.current === 'build') learning.abandon();
     const grab = this.world.getSystem(GrabSystem);
     for (const p of this.parts) if (p.hasComponent(Grabbed)) grab?.forceRelease(p);
     for (const e of this.entities) e.dispose();
@@ -251,6 +255,7 @@ export class BuildSystem extends createSystem({
       return;
     }
     playSfx('wrong');
+    if (best >= 0) learning.mistake('build', 'WRONG_SLOT', NAMES[kind]);
     this.setMsg(best >= 0 ? HINTS[kind] : 'Drop it on a glowing spot');
     this.sendHome(e);
   }
@@ -261,6 +266,7 @@ export class BuildSystem extends createSystem({
     if (e.hasComponent(OneHandGrabbable)) e.removeComponent(OneHandGrabbable);
     this.placeAttached();
     playSfx('correct');
+    learning.action('build', 'attach_part');
     this.flash = 1;
     const count = this.filled.filter(Boolean).length;
     if (count === SPOTS.length) {
@@ -286,6 +292,7 @@ export class BuildSystem extends createSystem({
     if (this.driveT >= 0 || this.filled.filter(Boolean).length < SPOTS.length) return;
     this.ui['build-go']?.setProperties({ display: 'none' });
     this.setMsg('Driving! (simplified demo)');
+    learning.action('build', 'go');
     this.driveT = 0;
     ARM_SIGNAL.celebrateUntil = performance.now() / 1000 + 5;
   }
@@ -336,6 +343,7 @@ export class BuildSystem extends createSystem({
       this.finishIn -= delta;
       if (this.finishIn < 0) {
         markLevelDone('3b');
+        learning.complete('build', mistakeStars(learning.mistakes));
         playSfx('end');
         this.ui['build-edit']?.setProperties({ display: 'none' });
         this.ui['build-done']?.setProperties({ display: 'flex' });

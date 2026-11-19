@@ -13,6 +13,9 @@ import { Bin, GameState, Part } from './lab-components.js';
 import { initSfx, playSfx } from './sfx.js';
 import { NAV, PHASE_BUILD, PHASE_CIRCUIT, PHASE_MENU, PHASE_PROGRAM } from './nav.js';
 import { isLevelDone, markLevelDone } from './progress.js';
+import type { Stars } from './core/events.js';
+import { sortStars } from './core/stars.js';
+import { learning, modeOf } from './learning.js';
 import {
   ARM_SIGNAL,
   LAYOUT,
@@ -46,8 +49,8 @@ const POP_SCALE = 0.09;
 const POP_TOWARD_PLAYER = 0.08;
 
 /** Star thresholds (defaults; Mike and Joshua can change): 1 star for playing, 2 at 50, 3 at 90. */
-export function starsFor(score: number): number {
-  return score >= 90 ? 3 : score >= 50 ? 2 : 1;
+export function starsFor(score: number): Stars {
+  return sortStars(score);
 }
 
 /**
@@ -103,7 +106,10 @@ export class GameSystem extends createSystem({
     this.state = this.world.createTransformEntity();
     this.state.addComponent(GameState, { timeLeft: ROUND_SECONDS });
     initSfx(this.world);
-    this.queries.held.subscribe('qualify', () => playSfx('grab'));
+    this.queries.held.subscribe('qualify', () => {
+      playSfx('grab');
+      learning.action('sort', 'grab_part');
+    });
     // Tutorial runs on the first START of each XR session.
     this.cleanupFuncs.push(
       this.world.visibilityState.subscribe((state) => {
@@ -214,6 +220,7 @@ export class GameSystem extends createSystem({
 
   /** Ends any Level 1 round in progress: release held parts, stop the hint. */
   private stopRound(): void {
+    if (learning.current === 'sort') learning.abandon();
     this.stopHint();
     this.refillIn = -1;
     this.timerRunning = false;
@@ -294,6 +301,7 @@ export class GameSystem extends createSystem({
     this.setText('score-value', '0');
     this.setText('feedback', 'Pinch the glowing part!');
     this.showView(PHASE_PLAYING);
+    learning.start('sort', 0, modeOf(this.world));
   }
 
   /** Hint the part with the shortest move: one already in its bin's column, else the middle one. */
@@ -326,6 +334,7 @@ export class GameSystem extends createSystem({
     this.setText('result-score', `Score: ${score}`);
     this.setText('result-detail', `${sorted} part${sorted === 1 ? '' : 's'} sorted`);
     const stars = starsFor(score);
+    learning.complete('sort', stars);
     for (let i = 1; i <= 3; i++) {
       this.ui[`star-${i}`]?.setProperties({ color: i <= stars ? '#f5c542' : '#5a5d66' });
     }
@@ -498,6 +507,7 @@ export class GameSystem extends createSystem({
         this.state.setValue(GameState, 'sorted', sorted);
         this.setText('score-value', String(score));
         this.setText('feedback', `+${POINTS} Correct!`);
+        learning.action('sort', 'part_sorted');
         if (!this.timerRunning) {
           this.timerRunning = true;
           this.stopHint();
@@ -505,6 +515,7 @@ export class GameSystem extends createSystem({
         if (this.scored.every(Boolean)) this.refillIn = REFILL_DELAY;
       } else {
         if (!tutorial) this.setText('feedback', 'Wrong bin. Try again.');
+        learning.mistake('sort', 'WRONG_BIN', `part ${slot} in bin ${binSlot}`);
         playSfx('wrong');
         this.sendHome(part);
       }

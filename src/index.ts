@@ -17,6 +17,9 @@ import { PanelSystem } from './panel.js';
 import { PartRespawnSystem } from './part-respawn.js';
 import { ProgramSystem } from './program.js';
 import { TablePlacementSystem } from './table-placement.js';
+import { logEventsIfDebug } from './learning.js';
+
+logEventsIfDebug();
 
 World.create(
   document.getElementById('scene-container') as HTMLDivElement,

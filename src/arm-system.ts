@@ -1,6 +1,7 @@
 import { createSystem, Grabbed, Vector3 } from '@iwsdk/core';
 import { Part } from './lab-components.js';
 import { ARM_SIGNAL, getArmRig } from './lab.js';
+import { learning } from './learning.js';
 import { ARM, ARM_REACH, GRIP_CLOSED, GRIP_OPEN, setForearmOutOfReach } from './robot-arm.js';
 
 /**
@@ -23,6 +24,8 @@ export class ArmSystem extends createSystem({
   private elbowPitch = -1.2;
   private grip = GRIP_OPEN;
   private wasOut = false;
+  /** OUT_OF_REACH is reported once per grab, not every time the part crosses the limit. */
+  private reachReported = false;
   private time = 0;
 
   update(delta: number): void {
@@ -83,6 +86,12 @@ export class ArmSystem extends createSystem({
     this.grip += (goalGrip - this.grip) * k;
     rig.fingerL.position.x = -this.grip;
     rig.fingerR.position.x = this.grip;
+
+    if (!tracking) this.reachReported = false;
+    if (out && !this.reachReported) {
+      this.reachReported = true;
+      learning.mistake('sort', 'OUT_OF_REACH');
+    }
 
     if (out !== this.wasOut) {
       setForearmOutOfReach(rig, out);
