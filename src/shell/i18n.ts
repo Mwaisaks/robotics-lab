@@ -10,12 +10,16 @@ const STRINGS = {
     'start.subtitle': 'Practise robotics with your hands',
     'start.browser': 'PLAY IN BROWSER',
     'start.vr': 'ENTER VR',
+    'robo.name': 'Robo',
+    'robo.close': 'Close hint',
   },
   sw: {
     'start.title': 'Robotics Lab',
     'start.subtitle': 'Jifunze roboti kwa vitendo',
     'start.browser': 'CHEZA KWENYE KIVINJARI',
     'start.vr': 'INGIA VR',
+    'robo.name': 'Robo',
+    'robo.close': 'Funga dokezo',
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 
