@@ -8,7 +8,7 @@ Nov 19, 2026 · @Mwaisaka
 
 - **One-line pitch:** a hands-on robotics lab for schools that can't afford robotics kits. Learners sort parts, program a robot, wire circuits and build a robot in mixed reality, with an AI tutor that explains mistakes.
 - **Who it's for:** secondary school students (about 12–18) starting robotics, and the teachers and trainers who run their sessions. It's designed with Tukuze Afrika's work in Meru County schools in mind.
-- **What's new vs. the Meta prototype:** we build on our Nov 18 prototype (declared as prior work) in a 16-hour overnight build with a team of 3. The game idea stays the same. We add:
+- **What's new vs. the Meta prototype:** we build on our Nov 18 prototype (declared as prior work) in an 18-hour overnight build with a team of 3. The game idea stays the same. We add:
   - a **browser mode** (no headset needed)
   - an **AI tutor** (hints and explanations, English and Kiswahili)
   - **adaptive difficulty**
@@ -23,7 +23,7 @@ Nov 19, 2026 · @Mwaisaka
 
 - **Dates:**
   - build starts Thu 19 Nov, 4:00pm EAT, overnight
-  - **submission closes Fri 20 Nov, 8:00am**
+  - **final submission closes Fri 20 Nov, 10:00am EAT** (we submit by 9:00am)
   - presentations and judging on Fri in the Amphitheatre *\[time TBC\]*
 - **Track focus:** digital learning and **accessibility** in education. Solutions should address challenges in Kenya and Africa, with **measurable impact**.
 - **Rules that matter to us:**
@@ -75,7 +75,7 @@ Nov 19, 2026 · @Mwaisaka
 
 ## Solution and features
 
-**We start from the Nov 18 prototype (the baseline) and spend the 16 hours on what makes it a school-ready learning tool: browser mode, the Robo tutor, the teacher dashboard, Kiswahili and offline use.** Everything is tagged by priority:
+**We start from the Nov 18 prototype (the baseline) and spend the 18 hours on what makes it a school-ready learning tool: browser mode, the Robo tutor, the teacher dashboard, Kiswahili and offline use.** Everything is tagged by priority:
 
 - **P0** = the demo fails without it
 - **P1** = strongly wanted
@@ -92,7 +92,7 @@ The baseline already has: a Quest WebXR app (Immersive Web SDK) with hand tracki
 - **Level 3 Light it up**: tap-to-wire LED circuit with mistake messages
 - *\[confirm whether "Build the robot" (Level 3 Part 2) made it into the baseline\]*
 
-### Hackfest work (what we build Thu 4:00pm → Fri 7:00am)
+### Hackfest work (what we build Thu 4:00pm → Fri 6:00am freeze)
 
 | # | Feature | Why it matters for the track | Priority | Owner |
 | --- | --- | --- | --- | --- |
@@ -288,7 +288,7 @@ export interface HintResponse { text: string; source: 'builtin' | 'ai' }   // ma
 
 **Communication:**
 
-- Rebecca is online, so use one team chat + a voice call at each gate (9:00pm, 12:30am, 4:00am, 6:30am).
+- Rebecca is online, so use one team chat + a voice call at each team checkpoint (9:00pm, 12:30am, 4:00am, 6:00am, 8:00am).
 - Post when you start or finish a branch.
 - `docs/STATUS.md` updated every 2 hours.
 
@@ -306,33 +306,33 @@ export interface HintResponse { text: string; source: 'builtin' | 'ai' }   // ma
 
 - She builds against a **mock event stream** until Phenny's events land (target 6:30pm), so she's never blocked.
 - She tests on the **Vercel preview links** of PRs. No local headset is needed.
-- The voice call at each gate covers: what merged, what's next, what's blocked.
+- The voice call at each checkpoint covers: what merged, what's next, what's blocked.
 
 **Pairing rule:** anyone blocked for more than 30 minutes says so in the chat right away. Phenny and Joshua sit together, so swap help directly.
 
-## 16-hour overnight plan
+## 18-hour overnight plan
 
-**Thu 4:00pm → Fri 8:00am EAT, with 3 people. We submit by 7:00am.** Each gate is a voice call. If a gate fails, we cut scope, not time.
+**Thu 4:00pm → Fri 10:00am EAT (final submission closes), with 3 people. We submit by 9:00am.** The times are our own team checkpoints, not organiser gates; each is a voice call. If a checkpoint slips, we cut scope, not time.
 
-| Time (EAT) | Phenny (on site) | Joshua (on site) | Rebecca (online) | Gate |
+| Time (EAT) | Phenny (on site) | Joshua (on site) | Rebecca (online) | Checkpoint |
 | --- | --- | --- | --- | --- |
-| 4:00–5:00pm | Copy the prototype, new repo, **`baseline` tag**, README "Prior work", agent pack, Vercel deploy of the baseline | Test the baseline on the Quest; bug list; start the mistake-code + hint-text table (`docs/activities/`) | Supabase schema (`docs/data.md`), AI provider + keys, `/api/hint` skeleton, dashboard wireframe | **G0 5:00pm:** baseline live on Vercel; everyone has the repo |
-| 5:00–9:00pm | `events.ts` + mistake codes emitted from Levels 1–3 (**by 6:30pm**); **browser mode** for Level 1 | Hint text in English for every code; Level 2 upgrade design (obstacles, REPEAT n, 5 challenges); start the Level 2 core + tests | Built-in hints + hint panel on a mock event stream → real events at 6:30pm; `/api/hint` working with fallback | **G1 9:00pm:** Robo shows built-in hints in Levels 1–3; Level 1 plays in the browser; API returns hints |
-| 9:00pm–12:30am | Browser mode for Levels 2 and 3; class-code + nickname screen | Level 2 upgrade in both modes; **Quest test 11:30pm** (all levels, hints visible) | AI hints live in the app; progress sync → Supabase; dashboard reads real data | **G2 12:30am:** all levels in the browser + Quest; dashboard shows a test class; **tag `demo-1`** |
-| 12:30–2:00am | Kiswahili toggle + plumbing; offline PWA. **README + slide outline drafted at 2:00am.** | Kiswahili hint text (with Rebecca); fixes from the Quest test. *Nap 1:00–2:00.* | Dashboard polish (top mistakes, time); seed the demo class; Kiswahili review | All P0 merged; README draft saved |
-| 2:00–4:00am | Read-aloud + large text; regression in both modes. *Nap 2:00–3:00 if on track.* | **Quest test 3:30am**; P2 Control the arm **only** if all P1 are done | P2 adaptive difficulty **only** if all P1 are done | **Tag `demo-2`** after a full regression |
-| **4:00am** | **Feature freeze** (all) |  |  | Bug fixes only from here |
-| 4:00–6:00am | Final README (prior work, Hackfest work list, setup, tech + external resources), regression | Headset clips + photos for the slides; fresh-eyes test with someone nearby | Impact and AI slides; dashboard screenshots | Slides complete; README final |
-| 6:00–7:00am | **Submit:** title + track, member names, leader's contact, repo link, slides, deployment link. Tag `final`. | Check the live link on a phone and on the Quest | Check the dashboard on the live link | **Submitted by 7:00am**, confirmed |
-| 7:00–8:00am | Buffer only. **No pushes to `main` after submitting.** |  |  |  |
+| 4:00–5:00pm | Copy the prototype, new repo, **`baseline` tag**, README "Prior work", agent pack, Vercel deploy of the baseline | Test the baseline on the Quest; bug list; start the mistake-code + hint-text table (`docs/activities/`) | Supabase schema (`docs/data.md`), AI provider + keys, `/api/hint` skeleton, dashboard wireframe | Setup: repo + baseline; everyone has the repo |
+| 5:00–9:00pm | `events.ts` + mistake codes emitted from Levels 1–3 (**by 6:30pm**); **browser mode** for Level 1 | Hint text in English for every code; Level 2 upgrade design (obstacles, REPEAT n, 5 challenges); start the Level 2 core + tests | Built-in hints + hint panel on a mock event stream → real events at 6:30pm; `/api/hint` working with fallback | **9:00pm:** Robo shows built-in hints in Levels 1–3; Level 1 plays in the browser |
+| 9:00pm–12:30am | Browser mode for Levels 2 and 3; class-code + nickname screen | Level 2 upgrade in both modes; **Quest test 11:30pm** (all levels, hints visible) | AI hints live in the app; progress sync → Supabase; dashboard reads real data | **12:30am:** all levels in the browser + Quest; dashboard shows a test class; **tag `demo-1`** |
+| 12:30–4:00am | Kiswahili toggle + plumbing; offline PWA; read-aloud + large text. **README + slide outline drafted at 4:00am.** | Kiswahili hint text (with Rebecca); fixes from the Quest test; P2 Control the arm **only** if all P1 are done. *Nap if on track.* | Dashboard polish (top mistakes, time); seed the demo class; Kiswahili review; P2 adaptive difficulty **only** if all P1 are done | All P0 merged; **no new features after 4:00am** |
+| 4:00–6:00am | Bug fixes; regression in both modes | **Quest test 4:30am**; headset clips + photos for the slides; fresh-eyes test with someone nearby | Bug fixes; dashboard screenshots | **Tag `demo-2`** after a full regression |
+| **6:00am** | **Feature freeze** (all) |  |  | Bug fixes only from here |
+| 6:00–8:00am | Final README (prior work, Hackfest work list, setup, tech + external resources), regression | Problem + robotics slides | Impact and AI slides | Slides complete; README final |
+| 8:00–9:00am | **Submit:** title + track, member names, leader's contact, repo link, slides, deployment link. Tag `final`. | Check the live link on a phone and on the Quest | Check the dashboard on the live link | **Submitted by 9:00am**, confirmed |
+| 9:00–10:00am | Buffer only (final submission closes 10:00am). **No pushes to `main` after submitting.** |  |  |  |
 | Before presenting | Rehearse twice; test casting and Wi-Fi in the Amphitheatre; charge the headset; phone hotspot ready |  | Join the presentation online if she presents a part (test the call first) |  |
 
 **Hard rules learned from the Meta deadline:**
 
 - Submit first, polish after.
-- No new feature starts after 2:00am. Freeze at 4:00am.
-- Phenny calls each gate out loud and updates `docs/STATUS.md`.
-- If a P0 is in trouble at a gate, the P1 items go first.
+- No new feature starts after 4:00am. Freeze at 6:00am.
+- Phenny calls each checkpoint out loud and updates `docs/STATUS.md`.
+- If a P0 is in trouble at a checkpoint, the P1 items go first.
 
 ## Instructions for AI coding agents
 
@@ -378,14 +378,14 @@ Say so, check the docs or the code, or ask. A small thing that works beats a big
 
 ## Testing and quality gates
 
-**Testing runs on four levels, cheapest first: unit tests on every PR, a browser check on every PR, emulator checks per headset change, and scheduled Quest sessions at each gate.** Phenny owns the test plan. Every activity owner adds their cases.
+**Testing runs on four levels, cheapest first: unit tests on every PR, a browser check on every PR, emulator checks per headset change, and scheduled Quest sessions at checkpoints.** Phenny owns the test plan. Every activity owner adds their cases.
 
 | Level | What | When | Who |
 | --- | --- | --- | --- |
 | Unit | Vitest on `src/core`: interpreter, circuit validator, assembly slots, inverse kinematics maths, scoring and stars, adaptive picker, hint lookup | Every PR (CI) | Each owner (with their agent) |
 | Browser | Play the changed activity start to finish with mouse, then touch (phone), from the PR preview link | Every PR | PR author; Phenny re-checks |
 | Emulator | IWSDK emulator: enter XR, hands mode, the changed activity | Any change in `src/xr` | Author |
-| Quest | The full checklist below on a real headset | 11:30pm, before tagging demo-2, and before submitting | Phenny + Joshua |
+| Quest | The full checklist below on a real headset | 11:30pm, 4:30am (before tagging demo-2), and before submitting | Phenny + Joshua |
 
 **Quest checklist (per activity):**
 
@@ -401,7 +401,7 @@ Say so, check the docs or the code, or ask. A small thing that works beats a big
 
 - **Edge cases:** an empty program, max blocks, a wrong polarity plus a missing resistor together, a part dropped off the table, double-taps, the hint API offline or slow (the built-in hint must appear within 1 s).
 - **Regression:** before each tag (`demo-1`, `demo-2`, `final`), every activity runs once in browser mode and once on the Quest, with no console errors.
-- **Fresh-eyes test:** someone outside the team finishes 2 activities without help (4:00–5:30am).
+- **Fresh-eyes test:** someone outside the team finishes 2 activities without help (4:00–6:00am).
 
 **Definition of done for any feature:**
 
@@ -478,7 +478,7 @@ Say so, check the docs or the code, or ask. A small thing that works beats a big
 
 | Risk | Likelihood | Impact | Mitigation | Owner |
 | --- | --- | --- | --- | --- |
-| Scope creep in the last 12 h | High | Missed submission | Feature freeze at 4:00am, submit by 7:00am, form drafted at 2:00am | Phenny (clock) |
+| Scope creep in the last 12 h | High | Missed submission | No new features after 4:00am, freeze at 6:00am, submit by 9:00am, form drafted at 4:00am | Phenny (clock) |
 | Browser mode costs more than expected with IWSDK | Medium | No headset-free story | Hour-1 spike; fallback: plain Three.js scene + `src/core` logic | Phenny |
 | Merge conflicts between our agents | High | Lost hours | Folder ownership, small PRs, frozen contracts after H2 | Phenny |
 | LLM API down, slow, costly or no key | Medium | No AI hints in the demo | Built-in hint table first; cache common AI answers; 3 s timeout → built-in hint | Rebecca |
