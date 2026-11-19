@@ -34,7 +34,7 @@ export const CHALLENGES: readonly Challenge[] = [
   // 5. Around a wall (only solvable with REPEAT)
   {
     start: { col: 0, row: 4, dir: 1 },
-    goal: { col: 2, row: 0 },
+    goal: { col: 3, row: 0 },
     obstacles: [
       [0, 2],
       [1, 2],

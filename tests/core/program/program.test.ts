@@ -52,7 +52,7 @@ describe('constants', () => {
       { start: [0, 4, 0], goal: [2, 2], obstacles: [], par: 5 },
       { start: [1, 4, 0], goal: [2, 1], obstacles: [[1, 2]], par: 6 },
       { start: [0, 2, 1], goal: [4, 2], obstacles: [], par: 2 },
-      { start: [0, 4, 1], goal: [2, 0], obstacles: [[0, 2], [1, 2], [2, 2], [3, 2]], par: 7 },
+      { start: [0, 4, 1], goal: [3, 0], obstacles: [[0, 2], [1, 2], [2, 2], [3, 2]], par: 7 },
     ];
     spec.forEach((s, i) => {
       const ch = CHALLENGES[i];
@@ -281,7 +281,7 @@ describe('all 5 challenges: spec example solutions', () => {
     [F, F, R, F, F],
     [F, R, F, L, F, F],
     [REP(4), F],
-    [REP(4), F, L, REP(4), F, L, REP(2), F],
+    [REP(4), F, L, REP(4), F, L, F],
   ];
 
   solutions.forEach((blocks, i) => {
@@ -334,8 +334,8 @@ describe('all 5 challenges: spec example solutions', () => {
     expect(solved).toBe(0);
   });
 
-  it('challenge 5 unrolled takes 12 blocks (over MAX_BLOCKS)', () => {
-    const blocks = [F, F, F, F, L, F, F, F, F, L, F, F];
+  it('challenge 5 unrolled takes 11 blocks (over MAX_BLOCKS)', () => {
+    const blocks = [F, F, F, F, L, F, F, F, F, L, F];
     expect(simulate(CHALLENGES[4], blocks).outcome).toBe('solved');
     expect(blocks.length).toBeGreaterThan(MAX_BLOCKS);
   });
@@ -521,7 +521,7 @@ describe('programActivity.apply: run, tries, mistakes', () => {
 
   it('WRONG_TURN on challenge 5 (example with turns swapped hits the S edge)', () => {
     // REPEAT 4 FORWARD -> (4,4) facing E, RIGHT -> S, FORWARD -> off the near edge.
-    const s = runOnce(4, [REP(4), F, R, REP(4), F, R, REP(2), F]);
+    const s = runOnce(4, [REP(4), F, R, REP(4), F, R, F]);
     expect(s.lastRun?.result?.outcome).toBe('HIT_WALL');
     expect(s.lastRun?.mistake).toEqual({ code: 'WRONG_TURN', detail: 'HIT_WALL' });
   });
@@ -604,7 +604,7 @@ describe('programActivity: stars and completion', () => {
   });
 
   it('max-size program (8 blocks) runs', () => {
-    const s = runOnce(4, [REP(4), F, L, REP(4), F, L, REP(2), F]);
+    const s = runOnce(4, [REP(4), F, L, REP(4), F, L, F]);
     expect(s.blocks).toHaveLength(MAX_BLOCKS - 1);
     const full = runOnce(0, [L, R, L, R, L, F, F, F]);
     expect(full.blocks).toHaveLength(MAX_BLOCKS);
