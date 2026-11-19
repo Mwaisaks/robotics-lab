@@ -63,17 +63,25 @@ export class BrowserModeSystem extends createSystem({
       if (e.pointerId === this.pointerId) this.carryTo(e);
     };
     const up = (e: PointerEvent) => {
-      if (e.pointerId === this.pointerId) this.release();
+      if (e.pointerId !== this.pointerId) return;
+      this.carryTo(e); // drop where the pointer was released, not where the last frame left it
+      this.release();
+    };
+    // A cancelled touch (palm, system gesture) or lost capture is not a drop.
+    const cancel = (e: PointerEvent) => {
+      if (e.pointerId === this.pointerId) this.release(false);
     };
     canvas.addEventListener('pointerdown', down);
     canvas.addEventListener('pointermove', move);
     canvas.addEventListener('pointerup', up);
-    canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('pointercancel', cancel);
+    canvas.addEventListener('lostpointercapture', cancel);
     this.cleanupFuncs.push(
       () => canvas.removeEventListener('pointerdown', down),
       () => canvas.removeEventListener('pointermove', move),
       () => canvas.removeEventListener('pointerup', up),
-      () => canvas.removeEventListener('pointercancel', up),
+      () => canvas.removeEventListener('pointercancel', cancel),
+      () => canvas.removeEventListener('lostpointercapture', cancel),
     );
   }
 
@@ -156,19 +164,28 @@ export class BrowserModeSystem extends createSystem({
   /**
    * Drop. Level 1: the part falls onto the table or a bin; GameSystem scores it once
    * it rests. Build: BuildSystem snaps it to a matching spot or sends it home.
-   * `checkDrop` is false when the drag is cancelled (phase changed, part removed).
+   * `checkDrop` is false when the drag is cancelled (pointer cancelled, phase
+   * changed, XR entered): a Build part then goes back home instead of floating.
    */
   private release(checkDrop = true): void {
-    if (this.pointerId >= 0) {
-      const canvas = this.renderer.domElement;
-      if (canvas.hasPointerCapture(this.pointerId)) canvas.releasePointerCapture(this.pointerId);
-    }
+    // Clear state first: releasing capture fires lostpointercapture, which must not re-enter.
+    const pointerId = this.pointerId;
     const part = WEB.dragged;
     const kind = this.kind;
     this.pointerId = -1;
     this.kind = null;
     WEB.dragged = null;
-    if (checkDrop && part != null && kind === 'build') WEB.onBuildDrop(part);
+    if (pointerId >= 0) {
+      const canvas = this.renderer.domElement;
+      if (canvas.hasPointerCapture(pointerId)) canvas.releasePointerCapture(pointerId);
+    }
+    if (part == null || kind !== 'build') return;
+    if (checkDrop) {
+      part.object3D?.position.set(this.target[0], this.target[1], this.target[2]);
+      WEB.onBuildDrop(part);
+    } else {
+      WEB.onBuildCancel(part);
+    }
   }
 
   private placeCamera(): void {

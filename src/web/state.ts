@@ -11,4 +11,6 @@ export const WEB = {
   dragged: null as Entity | null,
   /** Set by BuildSystem: a Build-the-robot part was dropped with mouse/touch (same as a hand release). */
   onBuildDrop: (_part: Entity): void => undefined,
+  /** Set by BuildSystem: a mouse/touch drag of a Build part was cancelled; put it back. */
+  onBuildCancel: (_part: Entity): void => undefined,
 };

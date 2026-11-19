@@ -97,6 +97,11 @@ export class BuildSystem extends createSystem({
     NAV.stopBuild = () => this.stop();
     this.queries.held.subscribe('disqualify', (e) => this.onRelease(e));
     WEB.onBuildDrop = (e) => this.onRelease(e);
+    WEB.onBuildCancel = (e) => this.sendHome(e);
+    this.cleanupFuncs.push(() => {
+      WEB.onBuildDrop = () => undefined;
+      WEB.onBuildCancel = () => undefined;
+    });
   }
 
   private phase(): number {
