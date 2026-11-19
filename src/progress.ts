@@ -14,8 +14,8 @@ function read(): Record<string, boolean> {
   }
 }
 
-/** Level 3 counts as done only when both parts are ('3a' circuit, '3b' build). */
-export function isLevelDone(level: 1 | 2 | 3): boolean {
+/** Done ticks: 1, 2, '3a' (Light it up), '3b' (Build the robot); 3 = both parts of Level 3. */
+export function isLevelDone(level: 1 | 2 | 3 | '3a' | '3b'): boolean {
   const data = read();
   if (level === 3) return data.level3a === true && data.level3b === true;
   return data[`level${level}`] === true;
