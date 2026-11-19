@@ -49,12 +49,14 @@ describe('event bus', () => {
 
 describe('mistake codes', () => {
   it('lists the BRIEF codes for the three baseline levels', () => {
-    expect(MISTAKE_CODES.sort).toEqual(['OUT_OF_REACH', 'WRONG_BIN']);
-    expect(MISTAKE_CODES.program).toContain('HIT_WALL');
-    expect(MISTAKE_CODES.program).toContain('MISSED_GOAL');
-    expect(MISTAKE_CODES.circuit).toEqual(
-      expect.arrayContaining(['OPEN_LOOP', 'LED_REVERSED', 'NO_RESISTOR', 'SHORT_CIRCUIT']),
-    );
+    expect(MISTAKE_CODES.sort).toEqual(['WRONG_BIN', 'OUT_OF_REACH', 'DROPPED_OFF_TABLE']);
+    expect(MISTAKE_CODES.program).toEqual([
+      'HIT_WALL', 'HIT_OBSTACLE', 'MISSED_GOAL', 'TOO_MANY_BLOCKS', 'EMPTY_PROGRAM',
+    ]);
+    expect(MISTAKE_CODES.circuit).toEqual([
+      'OPEN_LOOP', 'LED_REVERSED', 'NO_RESISTOR', 'SHORT_CIRCUIT', 'LED_NOT_IN_LOOP', 'SWITCH_NOT_IN_LOOP',
+    ]);
     expect(MISTAKE_CODES.build).toEqual(['WRONG_SLOT']);
+
   });
 });

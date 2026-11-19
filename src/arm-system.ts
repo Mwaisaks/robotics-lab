@@ -1,6 +1,7 @@
 import { createSystem, Grabbed, Vector3 } from '@iwsdk/core';
 import { Part } from './lab-components.js';
 import { ARM_SIGNAL, getArmRig } from './lab.js';
+import { MISTAKE } from './core/events.js';
 import { learning } from './learning.js';
 import { ARM, ARM_REACH, GRIP_CLOSED, GRIP_OPEN, setForearmOutOfReach } from './robot-arm.js';
 
@@ -90,7 +91,7 @@ export class ArmSystem extends createSystem({
     if (!tracking) this.reachReported = false;
     if (out && !this.reachReported) {
       this.reachReported = true;
-      learning.mistake('sort', 'OUT_OF_REACH');
+      learning.mistake('sort', MISTAKE.OUT_OF_REACH);
     }
 
     if (out !== this.wasOut) {

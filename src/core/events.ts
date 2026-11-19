@@ -24,15 +24,54 @@ export type LearningEvent =
     };
 
 /**
- * Mistake codes per activity (docs/BRIEF.md, "Learning design"). The activity
- * specs in docs/activities/ own the final list; keep this in sync with them.
+ * Mistake codes. Code always uses MISTAKE.X, so renaming a code is a one-line
+ * change to its value here. The activity specs in docs/activities/ own the list.
  */
+export const MISTAKE = {
+  // Level 1, Sort the parts
+  WRONG_BIN: 'WRONG_BIN',
+  OUT_OF_REACH: 'OUT_OF_REACH',
+  DROPPED_OFF_TABLE: 'DROPPED_OFF_TABLE',
+  // Level 2, Program the robot
+  HIT_WALL: 'HIT_WALL',
+  HIT_OBSTACLE: 'HIT_OBSTACLE',
+  MISSED_GOAL: 'MISSED_GOAL',
+  TOO_MANY_BLOCKS: 'TOO_MANY_BLOCKS',
+  EMPTY_PROGRAM: 'EMPTY_PROGRAM',
+  // Level 3, Light it up
+  OPEN_LOOP: 'OPEN_LOOP',
+  LED_REVERSED: 'LED_REVERSED',
+  NO_RESISTOR: 'NO_RESISTOR',
+  SHORT_CIRCUIT: 'SHORT_CIRCUIT',
+  LED_NOT_IN_LOOP: 'LED_NOT_IN_LOOP',
+  SWITCH_NOT_IN_LOOP: 'SWITCH_NOT_IN_LOOP',
+  // Level 3 Part 2, Build the robot
+  WRONG_SLOT: 'WRONG_SLOT',
+  // P2, Control the arm
+  TARGET_UNREACHABLE: 'TARGET_UNREACHABLE',
+  JOINT_LIMIT: 'JOINT_LIMIT',
+} as const;
+
+/** Which codes each activity may emit. */
 export const MISTAKE_CODES = {
-  sort: ['OUT_OF_REACH', 'WRONG_BIN'],
-  program: ['HIT_WALL', 'HIT_OBSTACLE', 'MISSED_GOAL', 'TOO_MANY_BLOCKS'],
-  circuit: ['OPEN_LOOP', 'LED_REVERSED', 'NO_RESISTOR', 'SHORT_CIRCUIT', 'NO_SWITCH'],
-  build: ['WRONG_SLOT'],
-  arm: ['TARGET_UNREACHABLE', 'JOINT_LIMIT'],
+  sort: [MISTAKE.WRONG_BIN, MISTAKE.OUT_OF_REACH, MISTAKE.DROPPED_OFF_TABLE],
+  program: [
+    MISTAKE.HIT_WALL,
+    MISTAKE.HIT_OBSTACLE,
+    MISTAKE.MISSED_GOAL,
+    MISTAKE.TOO_MANY_BLOCKS,
+    MISTAKE.EMPTY_PROGRAM,
+  ],
+  circuit: [
+    MISTAKE.OPEN_LOOP,
+    MISTAKE.LED_REVERSED,
+    MISTAKE.NO_RESISTOR,
+    MISTAKE.SHORT_CIRCUIT,
+    MISTAKE.LED_NOT_IN_LOOP,
+    MISTAKE.SWITCH_NOT_IN_LOOP,
+  ],
+  build: [MISTAKE.WRONG_SLOT],
+  arm: [MISTAKE.TARGET_UNREACHABLE, MISTAKE.JOINT_LIMIT],
 } as const satisfies Record<ActivityId, readonly string[]>;
 
 export type MistakeCode<A extends ActivityId = ActivityId> = (typeof MISTAKE_CODES)[A][number];

@@ -18,6 +18,7 @@ import { ARM_SIGNAL, LAYOUT, placeGamePanel, toWorld } from './lab.js';
 import { NAV, PHASE_BUILD } from './nav.js';
 import { markLevelDone } from './progress.js';
 import { playSfx } from './sfx.js';
+import { MISTAKE } from './core/events.js';
 import { mistakeStars } from './core/stars.js';
 import { learning, modeOf } from './learning.js';
 
@@ -255,7 +256,7 @@ export class BuildSystem extends createSystem({
       return;
     }
     playSfx('wrong');
-    if (best >= 0) learning.mistake('build', 'WRONG_SLOT', NAMES[kind]);
+    if (best >= 0) learning.mistake('build', MISTAKE.WRONG_SLOT, NAMES[kind]);
     this.setMsg(best >= 0 ? HINTS[kind] : 'Drop it on a glowing spot');
     this.sendHome(e);
   }
