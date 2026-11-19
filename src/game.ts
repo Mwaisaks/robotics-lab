@@ -134,9 +134,9 @@ export class GameSystem extends createSystem({
       'time-value', 'score-value', 'feedback', 'result-score', 'result-detail',
       'star-1', 'star-2', 'star-3',
       'howto-button', 'tutorial-view', 'skip-button',
-      'menu-view', 'level1-button', 'level2-button', 'level3-button', 'exit-button-menu',
+      'menu-view', 'level1-button', 'level2-button', 'level3-button', 'build-button', 'exit-button-menu',
       'menu-button-start', 'menu-button-result', 'menu-button-play', 'next-level-button',
-      'program-view', 'circuit-view', 'build-view', 'tick-1', 'tick-2', 'tick-3',
+      'program-view', 'circuit-view', 'build-view', 'tick-1', 'tick-2', 'tick-3', 'tick-3b',
     ]) {
       this.ui[id] = panel.getElementById(id) ?? undefined;
     }
@@ -163,6 +163,9 @@ export class GameSystem extends createSystem({
       },
       'level3-button': () => {
         if (this.phase() === PHASE_MENU) this.startLevel(3);
+      },
+      'build-button': () => {
+        if (this.phase() === PHASE_MENU) this.startLevel(4);
       },
       'next-level-button': () => {
         if (this.phase() === PHASE_RESULT) this.startLevel(2);
@@ -249,8 +252,10 @@ export class GameSystem extends createSystem({
     setLabMode(this.world, 'sort');
     this.state.setValue(GameState, 'phase', PHASE_MENU);
     this.showView(PHASE_MENU);
-    for (const level of [1, 2, 3] as const) {
-      this.ui[`tick-${level}`]?.setProperties({ display: isLevelDone(level) ? 'flex' : 'none' });
+    // Menu ticks: Light it up (3a) and Build the robot (3b) are separate buttons now.
+    const ticks = [['tick-1', 1], ['tick-2', 2], ['tick-3', '3a'], ['tick-3b', '3b']] as const;
+    for (const [id, level] of ticks) {
+      this.ui[id]?.setProperties({ display: isLevelDone(level) ? 'flex' : 'none' });
     }
   }
 
