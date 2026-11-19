@@ -31,14 +31,22 @@ Run `TZ=Africa/Nairobi date` at the start of every report and say how long until
 11. Don't rewrite working baseline code. Extend it; if a baseline file must change a lot, say why in the PR. Never rewrite git history (no force-push, no amend on pushed commits): the commit log is our proof of Hackfest work.
 12. Smallest working version first. No features outside BRIEF/your role file without asking your human.
 
+## Coordination protocol
+- **Only Phenny's agent merges to main.** Everyone else opens PRs and never merges (not even their own).
+- **Shared files (only Phenny's agent edits them):** `src/core/events.ts`, `src/shell/**` (incl. `src/shell/i18n.ts`), `package.json` + `package-lock.json`, `.github/**`, `AGENTS.md`, `SETUP.md`, `docs/BRIEF.md`, `vite.config.ts`, `iwsdk.config.json`. Need a change there? Write it under **"Needs from integrator"** in your PR instead of editing.
+- **Before any task:** `git pull origin main`; `gh issue list --assignee @me`; check open PRs for files you will touch: `gh pr list`, then `gh pr diff <n> --name-only`. Overlap with someone else's PR -> STOP and tell your human.
+- **One issue per task.** Branch `feat/<area>-<issue#>-<name>` (or `fix/...`); PR body says `Closes #<issue#>`. No issue yet? Ask your human to create one.
+- **Push = draft PR straight away:** `gh pr create --draft --fill` (the template adds the sections), then `gh pr ready` when CI passes.
+- **Before marking ready, bring your branch up to date with main.** Rebase only commits you have not pushed yet (`git pull --rebase origin main` before your first push). Once a branch is pushed, use `git fetch origin && git merge origin/main`: never force-push, never rewrite pushed history, never push to main.
+
 ## Workflow for every task
 1. Restate the task, list files you'll change.
-2. `git pull origin main`, then branch `feat/<area>-<name>` (or fix/...).
+2. Follow the coordination protocol above: pull main, check your issue and open PRs, branch `feat/<area>-<issue#>-<name>`.
 3. Core logic + tests first, then renderer(s).
 4. `npm run typecheck && npm test && npm run build` must pass.
 5. Test in browser mode (PR preview link). If you touched src/xr, list what must be checked on the Quest.
 6. Small commits, plain present-tense messages. No Co-Authored-By or AI attribution trailers.
-7. Open a PR with gh: what/why, how to test, screenshots, modes tested. Merge within ~3 hours of starting the branch.
+7. Draft PR on first push (template: What / Why, Closes #, Files touched, How to test, Integration notes, Needs from integrator); mark ready when CI passes. Phenny's agent merges; aim to be merge-ready within ~3 hours of starting the branch.
 8. Update your line in docs/STATUS.md. Report to your human in 3-5 lines: works / doesn't / needs testing.
 
 ## When unsure
