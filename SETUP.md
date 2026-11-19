@@ -26,17 +26,21 @@ The repo starts from our 18 Nov prototype, which is tagged `baseline` and declar
 
 ## 2. Timeline (EAT, Thu 19 → Fri 20 Nov)
 
+These are our own team checkpoints, not organiser gates.
+
 | Time | What must be true |
 |---|---|
-| 5:00pm (gate G0) | The baseline is live on Vercel and everyone has the repo running |
-| 6:30pm | Learning events and mistake codes are live in Levels 1–3, so Rebecca can switch from mock to real events |
-| 9:00pm (gate G1) | Robo built-in hints in all levels; Level 1 plays in the browser; `/api/hint` works |
-| 12:30am (gate G2) | All levels in the browser and on the Quest; the dashboard shows a test class; tag `demo-1` |
-| 2:00am | No new features start after this. README draft done. |
-| **4:00am** | **FEATURE FREEZE:** bug fixes only |
-| **7:00am** | **SUBMITTED** (submissions close at 8:00am) |
+| 9:00pm | Robo built-in hints in Levels 1–3; Level 1 plays in the browser |
+| 11:30pm | Quest test (all levels, hints visible) |
+| 12:30am | All levels in the browser and on the Quest; the dashboard shows a test class; tag `demo-1` |
+| 4:00am | No new features start after this. README draft done. |
+| 4:30am | Quest test; tag `demo-2` after a full regression |
+| **6:00am** | **FEATURE FREEZE:** bug fixes only |
+| 6:00–8:00am | README and slides final |
+| **8:00–9:00am** | **SUBMIT** (we submit by 9:00am) |
+| 9:00–10:00am | Buffer only. Final submission closes **Fri 10:00am**. |
 
-Each gate is a short voice call. Rebecca joins online.
+Each checkpoint is a short voice call (9:00pm, 12:30am, 4:00am, 6:00am, 8:00am). Rebecca joins online.
 
 ## 3. Install (once)
 You need:

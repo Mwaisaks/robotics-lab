@@ -7,4 +7,4 @@
 5. Rebecca: clone when pushed; start docs/data.md + hint lookup + api/hint.ts against a mock event stream.
 6. Parallel agent on one machine: git worktree add ../rl-<task> -b feat/<area>-<task> (one agent per folder).
 7. Before merging: "Use the reviewer subagent on PR #<n>". After core rules: "Use the test-writer subagent for src/core/<x>".
-8. Gates are voice calls: 5:00pm, 9:00pm, 12:30am, 4:00am (freeze), 6:30am (submit by 7:00am).
+8. Team checkpoints are voice calls: 9:00pm, 12:30am, 4:00am (no new features), 6:00am (freeze), 8:00am (submit by 9:00am; final submission closes 10:00am).

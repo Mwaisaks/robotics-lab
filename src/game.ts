@@ -11,7 +11,16 @@ import {
 } from '@iwsdk/core';
 import { Bin, GameState, Part } from './lab-components.js';
 import { initSfx, playSfx } from './sfx.js';
-import { NAV, PHASE_BUILD, PHASE_CIRCUIT, PHASE_MENU, PHASE_PROGRAM } from './nav.js';
+import {
+  NAV,
+  PHASE_BUILD,
+  PHASE_CIRCUIT,
+  PHASE_MENU,
+  PHASE_PLAYING,
+  PHASE_PROGRAM,
+  PHASE_TUTORIAL,
+} from './nav.js';
+import { WEB } from './web/state.js';
 import { isLevelDone, markLevelDone } from './progress.js';
 import { MISTAKE, type Stars } from './core/events.js';
 import { sortStars } from './core/stars.js';
@@ -63,9 +72,7 @@ const MIN_TABLE_TOP = 0.6;
 const MAX_TABLE_TOP = 1.15;
 
 const PHASE_START = 0;
-const PHASE_PLAYING = 1;
 const PHASE_RESULT = 2;
-const PHASE_TUTORIAL = 3;
 
 /**
  * How-to card (first START per XR session, or HOW TO PLAY): three icon steps and
@@ -172,7 +179,9 @@ export class GameSystem extends createSystem({
         if (this.phase() === PHASE_RESULT) this.toMenu();
       },
       'exit-button-menu': () => {
-        if (this.phase() === PHASE_MENU) this.world.exitXR();
+        if (this.phase() !== PHASE_MENU) return;
+        if (WEB.active) NAV.exitToStart();
+        else this.world.exitXR();
       },
       'skip-button': () => {
         if (this.phase() !== PHASE_TUTORIAL) return;
