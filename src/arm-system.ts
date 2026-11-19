@@ -48,7 +48,7 @@ export class ArmSystem extends createSystem({
       break;
     }
     // Browser mode: the part dragged with mouse/touch counts as held.
-    const dragged = WEB.dragged?.object3D;
+    const dragged = WEB.dragged?.hasComponent(Part) ? WEB.dragged.object3D : undefined;
     if (!tracking && dragged != null) {
       dragged.getWorldPosition(this.target);
       this.local.copy(this.target);
