@@ -1,0 +1,24 @@
+{
+  "sort": {
+    "WRONG_BIN": "That bin is for a different part. Match the colour and the shape outline.",
+    "OUT_OF_REACH": "The arm can't reach that far. Every robot has a workspace: the area it can reach.",
+    "DROPPED_OFF_TABLE": "Oops, it fell off. Place parts gently inside the work area."
+  },
+  "program": {
+    "HIT_WALL": "The robot hit the edge. Count the squares before you move forward.",
+    "HIT_OBSTACLE": "Something is in the way. Try turning before you move forward.",
+    "MISSED_GOAL": "Close! The program ended before the star. Add the missing steps.",
+    "WRONG_TURN": "Left and right are from the robot's view. Look at where its eyes point.",
+    "TOO_MANY_BLOCKS": "You did it! Can you use REPEAT to do it with fewer blocks?",
+    "EMPTY_PROGRAM": "Add some blocks first, then press RUN."
+  },
+  "circuit": {
+    "OPEN_LOOP": "Electricity needs a full loop. Connect back to the battery's minus side.",
+    "LED_REVERSED": "LEDs only work one way. The long leg (+) goes toward the battery's plus side.",
+    "NO_RESISTOR": "Add a resistor. It limits the current so the LED doesn't burn out.",
+    "SHORT_CIRCUIT": "That's a short circuit. Current must pass through the parts, not around them.",
+    "LED_NOT_IN_LOOP": "The LED isn't in the loop yet. Wire it between the resistor and the battery.",
+    "SWITCH_NOT_IN_LOOP": "Add the switch to the loop and turn it on to let the current flow.",
+    "SWITCH_OFF": "Add the switch to the loop and turn it on to let the current flow."
+  }
+}
