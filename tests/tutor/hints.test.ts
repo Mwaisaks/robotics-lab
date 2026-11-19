@@ -18,6 +18,12 @@ describe('builtinHint', () => {
     expect(builtinHint('sort', 'WRONG_BIN', 'fr')).toBe(en.sort.WRONG_BIN);
   });
 
+  it('has a non-empty generic hint in both en and sw', () => {
+    expect(GENERIC_HINT.en.trim()).not.toBe('');
+    expect(GENERIC_HINT.sw.trim()).not.toBe('');
+    expect(GENERIC_HINT.sw).not.toBe(GENERIC_HINT.en);
+  });
+
   it('falls back to the generic hint for an unknown code, in the requested language', () => {
     expect(builtinHint('program', 'NOT_A_CODE', 'en')).toBe(GENERIC_HINT.en);
     expect(builtinHint('program', 'NOT_A_CODE', 'sw')).toBe(GENERIC_HINT.sw);

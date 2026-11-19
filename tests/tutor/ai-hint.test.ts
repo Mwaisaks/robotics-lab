@@ -4,6 +4,7 @@ import {
   cleanHintText,
   createRateLimiter,
   getHint,
+  OFF_TOPIC,
   parseHintRequest,
   SYSTEM_PROMPT,
 } from '../../src/tutor/ai-hint.js';
@@ -83,6 +84,17 @@ describe('cleanHintText', () => {
     expect(cleanHintText('See https://example.com for help.')).toBeNull();
     expect(cleanHintText('Email me@x.com.')).toBeNull();
     expect(cleanHintText('<script>x</script>')).toBeNull();
+  });
+
+  it('rejects off-topic answers and brand names', () => {
+    expect(cleanHintText(OFF_TOPIC)).toBeNull();
+    expect(cleanHintText(`${OFF_TOPIC}.`)).toBeNull();
+    expect(cleanHintText('Use an Arduino board here.')).toBeNull();
+    expect(SYSTEM_PROMPT).toContain(OFF_TOPIC);
+  });
+
+  it('keeps a valid Kiswahili hint', () => {
+    expect(cleanHintText('Hesabu miraba kwanza. Kisha songa mbele.')).toBe('Hesabu miraba kwanza. Kisha songa mbele.');
   });
 });
 

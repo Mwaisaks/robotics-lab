@@ -50,6 +50,12 @@ const ACTIVITY_NAMES: Record<ActivityId, string> = {
   arm: 'Control the arm (move base, shoulder and elbow joints to reach targets)',
 };
 
+/** The model replies with this when it can't stay on topic; we then use the built-in hint. */
+export const OFF_TOPIC = 'OFF_TOPIC';
+
+/** Brand names are not allowed in the app (AGENTS.md rule 6). */
+const BLOCKED_WORDS = /\b(arduino|esp32|raspberry|micro:?bit|lego)\b/i;
+
 export const SYSTEM_PROMPT = [
   'You are Robo, a friendly robotics tutor inside a learning app for secondary school students in Kenya (age 12-18).',
   'A student just made a mistake in an activity. Explain WHY it went wrong and what to try next.',
@@ -59,6 +65,7 @@ export const SYSTEM_PROMPT = [
   '- Be warm and encouraging. Never say the student is bad or wrong as a person.',
   '- Talk only about this activity and this mistake. No links, no brand names, no personal questions.',
   '- Do not just give the full answer; give the next step.',
+  `- If you cannot give an on-topic hint, reply exactly ${OFF_TOPIC}.`,
   'Reply with the hint text only.',
 ].join('\n');
 
@@ -83,7 +90,9 @@ export function buildUserPrompt(req: HintRequest): string {
 export function cleanHintText(raw: string): string | null {
   let text = raw.replace(/\s+/g, ' ').trim().replace(/^["']|["']$/g, '');
   if (!text) return null;
+  if (text.includes(OFF_TOPIC)) return null;
   if (/https?:|www\.|@|<|>|\{|\}/i.test(text)) return null;
+  if (BLOCKED_WORDS.test(text)) return null;
   // Keep at most 2 sentences.
   const sentences = text.match(/[^.!?]+[.!?]*/g) ?? [text];
   text = sentences.slice(0, 2).join('').trim();

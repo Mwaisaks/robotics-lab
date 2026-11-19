@@ -1,41 +1,53 @@
+/// <reference types="node" />
 /**
  * POST /api/hint  (Vercel function)
  * Body: HintRequest { activity, code, attempt, lang, context? }  ->  HintResponse { text, source }
  *
- * - The LLM key stays here (env LLM_API_KEY), never in the browser.
- * - 3 s timeout; on timeout, error, refusal or a bad answer -> built-in hint (still 200).
+ * - Calls Google Gemini over REST with plain fetch. Key stays here (env LLM_API_KEY), never in the browser.
+ * - 3 s timeout; on timeout, error, blocked or off-topic/too-long answer -> built-in hint (still 200).
  * - Simple per-IP rate limit; over the limit -> built-in hint, no LLM call.
  * - Only activity/code/attempt/lang/context reach the LLM; nicknames and class codes are dropped.
+ * API reference: https://aistudio.google.com/api-reference/generate-content
  */
-import Anthropic from '@anthropic-ai/sdk';
-import { createRateLimiter, getHint, HINT_TIMEOUT_MS, parseHintRequest, type LlmCall } from '../src/tutor/ai-hint.js';
+import { createRateLimiter, getHint, parseHintRequest, type LlmCall } from '../src/tutor/ai-hint.js';
 import { builtinHintResponse } from '../src/tutor/hints.js';
 
-// Claude Opus 5.5 by default; set HINT_MODEL in Vercel to switch model without a code change.
-const MODEL = process.env.HINT_MODEL || 'claude-opus-5-5';
+// Gemini Flash by default; set HINT_MODEL in Vercel to switch model without a code change.
+const MODEL = process.env.HINT_MODEL || 'gemini-3.8-flash';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`;
 
 // Default 30 hints per minute per IP (env HINT_RATE_LIMIT). A class behind one school IP shares it, so keep it generous.
 const allow = createRateLimiter(Number(process.env.HINT_RATE_LIMIT) || 30, 60_000);
 
 const apiKey = process.env.LLM_API_KEY;
-const client = apiKey ? new Anthropic({ apiKey, maxRetries: 0, timeout: HINT_TIMEOUT_MS }) : undefined;
 
-const callClaude: LlmCall | undefined = client
+interface GeminiResponse {
+  candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
+  promptFeedback?: { blockReason?: string };
+}
+
+const callGemini: LlmCall | undefined = apiKey
   ? async (system, user, signal) => {
-      const res = await client.beta.messages.create(
-        {
-          model: MODEL,
-          max_tokens: 1024,
-          output_config: { effort: 'low' }, // short hints; keeps latency well inside 3 s
-          betas: ['server-side-fallback-2026-07-01'],
-          fallbacks: 'default',
-          system,
-          messages: [{ role: 'user', content: user }],
-        },
-        { signal },
-      );
-      if (res.stop_reason !== 'end_turn') return ''; // refusal / max_tokens -> built-in hint
-      return res.content.map((b) => (b.type === 'text' ? b.text : '')).join('');
+      const res = await fetch(GEMINI_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents: [{ role: 'user', parts: [{ text: user }] }],
+          generationConfig: {
+            maxOutputTokens: 200,
+            // thinkingLevel is Gemini 3+ only (errors on older models); minimal thinking keeps us inside 3 s.
+            ...(MODEL.startsWith('gemini-3') ? { thinkingConfig: { thinkingLevel: 'MINIMAL' } } : {}),
+          },
+        }),
+        signal,
+      });
+      if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
+      const data = (await res.json()) as GeminiResponse;
+      const candidate = data.candidates?.[0];
+      // Blocked prompt, safety stop, cut-off answer, etc. -> '' -> built-in hint.
+      if (data.promptFeedback?.blockReason || candidate?.finishReason !== 'STOP') return '';
+      return (candidate.content?.parts ?? []).map((p) => p.text ?? '').join('');
     }
   : undefined;
 
@@ -62,5 +74,5 @@ export async function POST(request: Request): Promise<Response> {
 
   if (!allow(clientIp(request))) return json(builtinHintResponse(req));
 
-  return json(await getHint(req, callClaude));
+  return json(await getHint(req, callGemini));
 }
