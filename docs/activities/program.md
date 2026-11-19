@@ -53,10 +53,10 @@ Facing: N = away from the player, E = player's right, S = toward the player, W =
 | 2 | One turn | (0,4) N | (2,2) | none | 5 | FORWARD, FORWARD, RIGHT, FORWARD, FORWARD |
 | 3 | Around one obstacle | (1,4) N | (2,1) | (1,2) | 6 | FORWARD, RIGHT, FORWARD, LEFT, FORWARD, FORWARD |
 | 4 | Long straight path | (0,2) E | (4,2) | none | 2 | REPEAT 4, FORWARD |
-| 5 | Around a wall | (0,4) E | (2,0) | (0,2) (1,2) (2,2) (3,2) | 7 | REPEAT 4, FORWARD, LEFT, REPEAT 4, FORWARD, LEFT, REPEAT 2, FORWARD |
+| 5 | Around a wall | (0,4) E | (3,0) | (0,2) (1,2) (2,2) (3,2) | 7 | REPEAT 4, FORWARD, LEFT, REPEAT 4, FORWARD, LEFT, FORWARD |
 
 Challenges 4 and 5 need REPEAT to reach par. Challenge 5 can't be solved at all without
-REPEAT (the shortest program without it is 12 blocks; the limit is 8).
+REPEAT (the shortest program without it is 11 blocks; the limit is 8).
 
 ## Mistake codes
 | Code | When | Robo hint (EN) | Robo hint (SW, draft: native speaker must review) |
