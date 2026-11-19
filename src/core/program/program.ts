@@ -3,7 +3,8 @@
  * No three.js / IWSDK / DOM imports. Renderers animate `RunResult.steps` and
  * emit LearningEvents from `ProgramState.lastRun` (until src/core/events.ts lands).
  */
-import { CHALLENGES, GRID_SIZE, MAX_BLOCKS, type Challenge, type Dir, type Pose } from './challenges';
+import { programStars } from '../stars.js';
+import { CHALLENGES, GRID_SIZE, MAX_BLOCKS, type Challenge, type Dir, type Pose } from './challenges.js';
 
 export type Move = 'fwd' | 'back' | 'left' | 'right';
 export type RepeatCount = 2 | 3 | 4;
@@ -120,8 +121,8 @@ function swapTurns(blocks: readonly Block[]): Block[] {
 
 /** Stars for one solved run: 1 solved, 2 within par, 3 within par on the first try. */
 export function starsFor(blockCount: number, par: number, firstTry: boolean): 1 | 2 | 3 {
-  if (blockCount > par) return 1;
-  return firstTry ? 3 : 2;
+  // Shared rule in src/core/stars.ts; a solved run always earns at least 1 star.
+  return programStars(blockCount, firstTry ? 1 : 2, par) as 1 | 2 | 3;
 }
 
 function run(state: ProgramState): ProgramState {
