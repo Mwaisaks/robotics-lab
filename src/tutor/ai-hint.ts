@@ -50,6 +50,7 @@ const ACTIVITY_NAMES: Record<ActivityId, string> = {
   program: 'Program the robot (drive a robot on a grid to a star with FORWARD, BACK, LEFT, RIGHT and REPEAT blocks)',
   circuit: 'Light it up (a simplified circuit: battery, switch, resistor and LED wired in a loop)',
   build: 'Build the robot (snap wheels, motors and a controller board onto a chassis)',
+  micro: 'Microcontroller lab (a simplified board: wire an LED to D13 and a distance sensor to 5V/D7/D8/GND, then program IF NEAR LED ON ELSE LED OFF)',
   arm: 'Control the arm (move base, shoulder and elbow joints to reach targets)',
 };
 
