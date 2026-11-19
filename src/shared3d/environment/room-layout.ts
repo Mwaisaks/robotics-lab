@@ -39,16 +39,16 @@ const FRONT_Z = 1.8; // floor ends here, behind the player
 const SIDE_FRONT_Z = 0.6; // side walls stop here so the room is open toward the player
 
 const C = {
-  floor: 0x8f9499,
-  mat: 0x7d858c,
-  wall: 0xd9d4ca,
-  skirting: 0x5b6168,
-  stripe: 0x3f8f8a,
-  benchTop: 0xb98a5a,
-  metal: 0x6c737a,
-  shelf: 0xc9a77c,
-  window: 0xcfe6f2,
-  light: 0xfff6e0,
+  floor: 0xe9ebee,
+  mat: 0xdde1e6,
+  wall: 0xf7f8f9,
+  skirting: 0xd2d6db,
+  stripe: 0x2fb3a5,
+  benchTop: 0xf3f2ee,
+  metal: 0xb9c0c7,
+  shelf: 0xe4e7ea,
+  window: 0xe8f4fb,
+  light: 0xffffff,
 };
 
 function bench(boxes: RoomBox[], x0: number, x1: number, z0: number, z1: number): void {
@@ -99,7 +99,7 @@ export function buildRoomBoxes(): RoomBox[] {
   // Things on the benches: parts trays, a screen block, a toolbox.
   boxes.push({ c: [-2.3, 0.9, -1.2], s: [0.3, 0.1, 0.4], color: 0x3a7bd5 });
   boxes.push({ c: [-2.3, 0.88, -0.6], s: [0.25, 0.06, 0.3], color: 0xe0a030 });
-  boxes.push({ c: [-2.45, 1.05, -0.05], s: [0.05, 0.36, 0.5], color: 0x2b2f36 });
+  boxes.push({ c: [-2.45, 1.05, -0.05], s: [0.05, 0.36, 0.5], color: 0x9aa3ad });
   boxes.push({ c: [1.2, 0.93, BACK_Z + 0.35], s: [0.45, 0.16, 0.25], color: 0xc23b33 });
   boxes.push({ c: [1.8, 0.89, BACK_Z + 0.3], s: [0.3, 0.08, 0.3], color: 0x4caf50 });
   boxes.push({ c: [2.2, 0.95, BACK_Z + 0.25], s: [0.15, 0.2, 0.15], color: 0xf2f2f2 });

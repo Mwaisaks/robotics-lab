@@ -1,6 +1,5 @@
 import { VisibilityState, type World } from '@iwsdk/core';
 import { NAV } from '../nav.js';
-import { LAB_ENV, setVirtualLab } from '../shared3d/environment/settings.js';
 import { WEB } from '../web/state.js';
 import { t } from './i18n.js';
 import { cleanPlayer, loadChoice, saveChoice, type Player, type SavedChoice } from './player.js';
@@ -118,18 +117,7 @@ export function setupStartScreen(world: World, options: StartScreenOptions = {})
   const playerLine = document.createElement('p');
   playerLine.id = 'player-line';
   const changeButton = button('join-change', t('join.change'), 'link');
-  // Headset only: show the procedural lab room instead of passthrough (browser mode always shows it).
-  const virtualLabButton = button('virtual-lab', '', 'link');
-  const showVirtualLab = () => {
-    virtualLabButton.textContent = t(LAB_ENV.virtualLabInXR ? 'settings.virtualLab.on' : 'settings.virtualLab.off');
-    virtualLabButton.setAttribute('aria-pressed', String(LAB_ENV.virtualLabInXR));
-  };
-  showVirtualLab();
-  virtualLabButton.addEventListener('click', () => {
-    setVirtualLab(!LAB_ENV.virtualLabInXR);
-    showVirtualLab();
-  });
-  play.append(browserButton, vrButton, playerLine, changeButton, virtualLabButton);
+  play.append(browserButton, vrButton, playerLine, changeButton);
 
   root.append(title, subtitle, join, play);
   document.body.appendChild(root);

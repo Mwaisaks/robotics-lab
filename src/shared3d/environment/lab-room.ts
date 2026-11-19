@@ -3,6 +3,8 @@ import {
   BufferGeometry,
   Group,
   Mesh,
+  AmbientLight,
+  DirectionalLight,
   MeshBasicMaterial,
   MeshStandardMaterial,
 } from '@iwsdk/core';
@@ -38,5 +40,12 @@ export function createLabRoom(): Group {
     meshFrom(lit, new MeshStandardMaterial({ vertexColors: true, roughness: 0.92, metalness: 0 }), 'lab-room-matte'),
     meshFrom(glow, new MeshBasicMaterial({ vertexColors: true }), 'lab-room-glow'),
   );
+  // Bright, even lab light. Children of the room, so they only exist while the room
+  // is shown (browser mode); the headset keeps its own passthrough lighting.
+  const ambient = new AmbientLight(0xffffff, 0.9);
+  const key = new DirectionalLight(0xffffff, 1.1);
+  key.position.set(1.5, 3, 2);
+  key.castShadow = false;
+  root.add(ambient, key, key.target);
   return root;
 }

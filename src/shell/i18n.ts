@@ -21,8 +21,6 @@ const STRINGS = {
     'join.invalid': 'Check the class code and nickname',
     'join.change': 'Change',
     'join.asGuest': 'Playing as guest',
-    'settings.virtualLab.on': 'Virtual lab: on',
-    'settings.virtualLab.off': 'Virtual lab: off',
   },
   sw: {
     'start.title': 'Robotics Lab',
@@ -40,9 +38,6 @@ const STRINGS = {
     'join.invalid': 'Angalia msimbo wa darasa na jina la utani',
     'join.change': 'Badilisha',
     'join.asGuest': 'Unacheza kama mgeni',
-    // TODO(sw review): Virtual lab toggle lines need a native speaker's check.
-    'settings.virtualLab.on': 'Maabara pepe: imewashwa',
-    'settings.virtualLab.off': 'Maabara pepe: imezimwa',
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

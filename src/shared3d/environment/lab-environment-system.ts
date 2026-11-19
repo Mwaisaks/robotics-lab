@@ -1,14 +1,14 @@
 import { createSystem, Object3D, VisibilityState } from '@iwsdk/core';
 import { LAYOUT } from '../../lab.js';
 import { createLabRoom } from './lab-room.js';
-import { LAB_ENV, shouldShowRoom } from './settings.js';
+import { shouldShowRoom } from './settings.js';
 
 /**
  * Shows the procedural lab room (src/shared3d/environment/lab-room.ts):
  * - flat page (VisibilityState.NonImmersive): always, so browser mode has a room
  *   instead of a blank page;
- * - headset session: only when LAB_ENV.virtualLabInXR is on ("Virtual lab"
- *   setting), otherwise hidden so AR passthrough stays visible.
+ * - headset session: never (the "Virtual lab" toggle is hidden for the demo), so AR
+ *   passthrough stays visible.
  * The room follows the play table (LAYOUT x/z/yaw) in case table placement moved it.
  * update() only compares numbers and flips flags: no per-frame allocation.
  */
@@ -27,7 +27,7 @@ export class LabEnvironmentSystem extends createSystem({}) {
   update(): void {
     const show = shouldShowRoom(
       this.world.visibilityState.peek() === VisibilityState.NonImmersive,
-      LAB_ENV.virtualLabInXR,
+      false, // Virtual lab in XR is off for the demo (toggle hidden)
     );
     if (this.room.visible !== show) this.room.visible = show;
     if (!show) return;
