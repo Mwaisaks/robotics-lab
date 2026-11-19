@@ -1,0 +1,24 @@
+# Review requests go to the owner of each path. Later lines win.
+# Phenny (integrator): shared files, see AGENTS.md "Coordination protocol".
+/src/core/events.ts     @Mwaisaks
+/src/shell/             @Mwaisaks
+/package.json           @Mwaisaks
+/package-lock.json      @Mwaisaks
+/.github/               @Mwaisaks
+/AGENTS.md              @Mwaisaks
+/SETUP.md               @Mwaisaks
+/docs/BRIEF.md          @Mwaisaks
+/vite.config.ts         @Mwaisaks
+/iwsdk.config.json      @Mwaisaks
+
+# Joshua: Level 2 core and activity specs.
+/src/core/program/      @mumoh9796
+/docs/activities/       @mumoh9796
+
+# Rebecca: Robo tutor, API, dashboard.
+/src/tutor/             @okoko254
+/api/                   @okoko254
+/dashboard/             @okoko254
+
+# Hint text is Joshua's content in Rebecca's folder.
+/src/tutor/hints.*.json @mumoh9796 @okoko254
