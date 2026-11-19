@@ -35,7 +35,7 @@ Level specs: `program.md` (Level 2). `sort.md` and `circuit.md` to follow.
 
 ## Codes beyond the list in AGENTS.md / the role file
 New: `DROPPED_OFF_TABLE`, `WRONG_TURN`, `EMPTY_PROGRAM`, `LED_NOT_IN_LOOP`, `SWITCH_NOT_IN_LOOP`, `SWITCH_OFF`.
-All approved by Phenny (19 Nov). `src/core/events.ts` on main still lacks `WRONG_TURN` (program) and `SWITCH_OFF` (circuit).
+All approved by Phenny (19 Nov) and listed in `src/core/events.ts`.
 
 Built-in hint files generated from this table: `src/tutor/hints.en.json`, `src/tutor/hints.sw.json`
 (`{ "<activity>": { "<CODE>": "hint" } }`). Edit this table first, then the JSON.
