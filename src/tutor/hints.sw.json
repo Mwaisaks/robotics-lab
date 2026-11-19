@@ -20,5 +20,14 @@
     "LED_NOT_IN_LOOP": "LED bado haiko kwenye mzunguko. Iunganishe kati ya kipingamizi na betri.",
     "SWITCH_NOT_IN_LOOP": "Weka swichi kwenye mzunguko na uiwashe ili mkondo upite.",
     "SWITCH_OFF": "Weka swichi kwenye mzunguko na uiwashe ili mkondo upite."
+  },
+  "micro": {
+    "LED_WRONG_PIN": "Programu inawasha pini D13. Unganisha mguu mrefu (+) wa LED kwenye D13.",
+    "LED_REVERSED": "LED huwaka ikiunganishwa upande mmoja tu. Mguu mrefu (+) uende D13 na mfupi uende GND.",
+    "NO_GND": "Mkondo unahitaji njia ya kurudi kwenye bodi. Unganisha GND au mguu mfupi kwenye pini ya GND.",
+    "SENSOR_MISWIRED": "Kila pini ya kihisi ina kazi moja. VCC iende 5V, TRIG iende D7 na ECHO iende D8.",
+    "SHORT_CIRCUIT": "Hiyo ni saketi fupi: 5V imeunganishwa moja kwa moja na GND. Umeme lazima upite kwenye kifaa kwanza.",
+    "PROGRAM_INCOMPLETE": "Uamuzi unahitaji pande zote mbili. Tumia IF NEAR, kitendo, ELSE, kisha kitendo.",
+    "LOGIC_REVERSED": "Angalia kila upande unafanya nini. LED ON iwe chini ya IF NEAR, LED OFF chini ya ELSE."
   }
 }
