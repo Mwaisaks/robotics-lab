@@ -7,7 +7,7 @@ Next: 12:30am Rebecca's PRs merged + Robo live + tag demo-1 · 1:15am lab room m
 |---|---|---|---|---|
 | Phenny | feat/shell-menu-levels (#35); Robo wiring after #22/#28; lab room agent (feat/lab-environment) | Repo, CI, Vercel live (robotics-lab-two.vercel.app), events, browser mode all levels, class-code screen, headset hint panel | Rebecca #22/#28 update-branch | 19 Nov 11:50pm |
 | Joshua | | | | |
-| Rebecca | feat/tutor-sync (pushed, PR next) | Gemini /api/hint; Robo hook + hint box; progress sync queue + /api/progress -> Supabase | Phenny: startTutor line + setPlayer line; Vercel SUPABASE_URL, SUPABASE_ANON_KEY | 19 Nov 9:10pm |
+| Rebecca | feat/tutor-robo (pushed, PR next) | Supabase schema; built-in hints; /api/hint on Gemini (model chain, 3 s, cache); Robo hook + browser hint box | Phenny: one line in src/index.ts to start Robo; Vercel LLM_API_KEY | 19 Nov 8:15pm |
 
 ## Baseline bugs (Joshua, from the Quest test)
 -
