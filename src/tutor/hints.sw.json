@@ -2,19 +2,19 @@
   "sort": {
     "WRONG_BIN": "Kisanduku hicho ni cha kifaa kingine. Linganisha rangi na umbo.",
     "OUT_OF_REACH": "Mkono wa roboti hauwezi kufika mbali hivyo. Kila roboti ina eneo inaloweza kufikia.",
-    "DROPPED_OFF_TABLE": "Lo, kimeanguka. Weka vifaa ndani ya eneo la kazi."
+    "DROPPED_OFF_TABLE": "Lo, kimeanguka kutoka mezani. Weka vifaa taratibu ndani ya eneo la kazi."
   },
   "program": {
     "HIT_WALL": "Roboti imegonga ukingo. Hesabu miraba kabla ya kusonga mbele.",
     "HIT_OBSTACLE": "Kuna kizuizi njiani. Jaribu kugeuka kabla ya kusonga mbele.",
-    "MISSED_GOAL": "Karibu! Programu imeisha kabla ya nyota. Ongeza hatua zinazokosekana.",
+    "MISSED_GOAL": "Umekaribia! Programu imeisha kabla ya nyota. Ongeza hatua zinazokosekana.",
     "WRONG_TURN": "Kushoto na kulia ni kwa mtazamo wa roboti. Angalia macho yake yanaelekea wapi.",
     "TOO_MANY_BLOCKS": "Umeweza! Je, unaweza kutumia RUDIA ili utumie vipande vichache?",
     "EMPTY_PROGRAM": "Ongeza vipande kwanza, kisha bonyeza ENDESHA."
   },
   "circuit": {
     "OPEN_LOOP": "Umeme unahitaji mzunguko kamili. Unganisha tena upande hasi wa betri.",
-    "LED_REVERSED": "LED hufanya kazi upande mmoja tu. Mguu mrefu (+) uelekee upande chanya wa betri.",
+    "LED_REVERSED": "LED huwaka ikiunganishwa upande mmoja tu. Mguu mrefu (+) uelekee upande chanya wa betri.",
     "NO_RESISTOR": "Ongeza kipingamizi. Hupunguza mkondo ili LED isiungue.",
     "SHORT_CIRCUIT": "Hiyo ni saketi fupi. Mkondo lazima upite kwenye vifaa, si kuvizunguka.",
     "LED_NOT_IN_LOOP": "LED bado haiko kwenye mzunguko. Iunganishe kati ya kipingamizi na betri.",
