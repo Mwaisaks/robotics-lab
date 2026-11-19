@@ -1,13 +1,13 @@
 # STATUS — update your line at least every 2 hours (EAT)
 
-Next checkpoint: 11:30pm — Quest test, all levels + Robo hints.
-Then: 12:30am Rebecca's final PR merged + tag demo-1 · 1:30am no new features · 2:30am Quest test + regression + tag demo-2 · 3:00am FREEZE · 3:00-4:30am README/slides/footage · submit 4:30-5:00am (closes Fri 6:00am).
+Quest test 11:30pm: all PASS (Joshua). Robo hints move to the 2:30am test.
+Next: 12:30am Rebecca's PRs merged + Robo live + tag demo-1 · 1:15am lab room merged · **1:45am no new features** · 2:30am Quest test + regression + tag demo-2 · **3:00am FREEZE** · 3:00-4:30am README/slides/footage · **submit 4:30-5:00am** (closes Fri 6:00am).
 
 | Who | Working on (branch) | Done | Blocked by | Updated |
 |---|---|---|---|---|
-| Phenny | feat/core-events (PR) | Repo, CI, Pages fallback; events + mistake codes in Levels 1-3 | Vercel import (account owner) | 19 Nov |
+| Phenny | feat/shell-menu-levels (#35); Robo wiring after #22/#28; lab room agent (feat/lab-environment) | Repo, CI, Vercel live (robotics-lab-two.vercel.app), events, browser mode all levels, class-code screen, headset hint panel | Rebecca #22/#28 update-branch | 19 Nov 11:50pm |
 | Joshua | | | | |
-| Rebecca | feat/dashboard (pushed, PR next) | /api/class + teacher dashboard page; DEMO1 seed script | Phenny: add dashboard/index.html to vite build input; then seed DEMO1 | 19 Nov 9:35pm |
+| Rebecca | feat/tutor-robo (pushed, PR next) | Supabase schema; built-in hints; /api/hint on Gemini (model chain, 3 s, cache); Robo hook + browser hint box | Phenny: one line in src/index.ts to start Robo; Vercel LLM_API_KEY | 19 Nov 8:15pm |
 
 ## Baseline bugs (Joshua, from the Quest test)
 -
