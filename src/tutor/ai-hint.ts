@@ -1,12 +1,15 @@
 /**
  * Pure logic behind /api/hint: request validation, the LLM prompt, output checks,
- * the 3 s timeout with built-in fallback, and a simple rate limiter.
+ * the time budget with built-in fallback, an AI answer cache, and a simple rate limiter.
  * No SDK, DOM or network here; api/hint.ts injects the actual LLM call.
  */
 import { MISTAKE_CODES, type ActivityId } from '../core/events.js';
 import { builtinHint, findBuiltinHint, type HintRequest, type HintResponse, type Lang } from './hints.js';
 
-export const HINT_TIMEOUT_MS = 3000;
+/** Server (/api/hint): total time for all Gemini models and retries, then the built-in hint. */
+export const SERVER_HINT_BUDGET_MS = 5500;
+/** Browser (ai-client.ts, startTutor): how long to wait for /api/hint. A bit longer than the server budget. */
+export const CLIENT_HINT_TIMEOUT_MS = 6000;
 const MAX_CONTEXT_CHARS = 120;
 const MAX_HINT_CHARS = 240;
 
@@ -103,9 +106,12 @@ export function cleanHintText(raw: string): string | null {
 /** The LLM call, injected by api/hint.ts. Must stop work when `signal` aborts. */
 export type LlmCall = (system: string, user: string, signal: AbortSignal) => Promise<string>;
 
-/** Cache key for AI answers: the same mistake, language and attempt get the same hint. */
-export function hintCacheKey(req: Pick<HintRequest, 'activity' | 'code' | 'lang' | 'attempt'>): string {
-  return `${req.activity}|${req.code}|${req.lang}|${req.attempt}`;
+/**
+ * Cache key for AI answers: the full request (activity, code, lang, attempt and context),
+ * so different contexts never share a cached answer.
+ */
+export function hintCacheKey(req: Pick<HintRequest, 'activity' | 'code' | 'lang' | 'attempt' | 'context'>): string {
+  return JSON.stringify([req.activity, req.code, req.lang, req.attempt, req.context ?? '']);
 }
 
 /** A small in-memory cache of good AI answers. Oldest entry is dropped when full. */
@@ -139,7 +145,7 @@ export interface GetHintOptions {
 export async function getHint(
   req: HintRequest,
   callLlm: LlmCall | undefined,
-  { timeoutMs = HINT_TIMEOUT_MS, cache }: GetHintOptions = {},
+  { timeoutMs = SERVER_HINT_BUDGET_MS, cache }: GetHintOptions = {},
 ): Promise<HintResponse> {
   const key = hintCacheKey(req);
   const cached = cache?.get(key);

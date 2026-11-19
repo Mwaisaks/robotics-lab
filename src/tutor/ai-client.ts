@@ -3,7 +3,7 @@
  * no AI answer within the time limit (offline, slow, error, or the server fell
  * back to a built-in hint). Never throws. No DOM; uses fetch only.
  */
-import { HINT_TIMEOUT_MS } from './ai-hint.js';
+import { CLIENT_HINT_TIMEOUT_MS } from './ai-hint.js';
 import type { HintRequest } from './hints.js';
 
 export interface FetchAiHintOptions {
@@ -14,7 +14,7 @@ export interface FetchAiHintOptions {
 
 export async function fetchAiHint(
   req: HintRequest,
-  { url = '/api/hint', timeoutMs = HINT_TIMEOUT_MS, fetchFn = globalThis.fetch }: FetchAiHintOptions = {},
+  { url = '/api/hint', timeoutMs = CLIENT_HINT_TIMEOUT_MS, fetchFn = globalThis.fetch }: FetchAiHintOptions = {},
 ): Promise<string | null> {
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return null;
   if (typeof fetchFn !== 'function') return null;

@@ -1,6 +1,7 @@
 # STATUS — update your line at least every 2 hours (EAT)
 
-Next gate: G0 5:00pm — baseline live on Vercel, everyone has the repo.
+Next checkpoint: 11:30pm — Quest test, all levels + Robo hints.
+Then: 12:30am Rebecca's final PR merged + tag demo-1 · 1:30am no new features · 2:30am Quest test + regression + tag demo-2 · 3:00am FREEZE · 3:00-4:30am README/slides/footage · submit 4:30-5:00am (closes Fri 6:00am).
 
 | Who | Working on (branch) | Done | Blocked by | Updated |
 |---|---|---|---|---|

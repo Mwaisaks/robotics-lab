@@ -67,10 +67,10 @@ describe('POST /api/hint with Gemini (fetch mocked)', () => {
     vi.useRealTimers();
   });
 
-  it('uses gemini-3.8-flash first, with thinkingLevel LOW and the key header', async () => {
+  it('uses gemini-3.5-flash-lite first, with thinkingLevel LOW and the key header', async () => {
     const { POST, fetchMock } = await load(() => ok('Count the squares. Then move forward.'));
     expect(await (await POST(hit())).json()).toEqual({ text: 'Count the squares. Then move forward.', source: 'ai' });
-    expect(calls.map((c) => c.model)).toEqual(['gemini-3.8-flash']);
+    expect(calls.map((c) => c.model)).toEqual(['gemini-3.5-flash-lite']);
     expect(calls[0]!.body.generationConfig.thinkingConfig).toEqual({ thinkingLevel: 'LOW' });
     expect((fetchMock.mock.calls[0]![1].headers as Record<string, string>)['x-goog-api-key']).toBe('test-key');
   });
@@ -82,15 +82,15 @@ describe('POST /api/hint with Gemini (fetch mocked)', () => {
   });
 
   it('503 (high demand) -> tries the next model', async () => {
-    const { POST } = await load((model) => (model === 'gemini-3.8-flash' ? status(503, 'high demand') : ok('Try turning first.')));
+    const { POST } = await load((model) => (model === 'gemini-3.5-flash-lite' ? status(503, 'high demand') : ok('Try turning first.')));
     expect(await (await POST(hit())).json()).toEqual({ text: 'Try turning first.', source: 'ai' });
-    expect(calls.map((c) => c.model)).toEqual(['gemini-3.8-flash', 'gemini-3.7-flash']);
+    expect(calls.map((c) => c.model)).toEqual(['gemini-3.5-flash-lite', 'gemini-3.8-flash']);
   });
 
   it('429 -> tries the next model, down to the last one', async () => {
-    const { POST } = await load((model) => (model === 'gemini-3.5-flash-lite' ? ok('Count again.') : status(429)));
+    const { POST } = await load((model) => (model === 'gemini-3.7-flash' ? ok('Count again.') : status(429)));
     expect(await (await POST(hit())).json()).toEqual({ text: 'Count again.', source: 'ai' });
-    expect(calls.map((c) => c.model)).toEqual(['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash-lite']);
+    expect(calls.map((c) => c.model)).toEqual(['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash']);
   });
 
   it('400 about thinking -> retries the same model once without thinkingConfig', async () => {
@@ -98,7 +98,7 @@ describe('POST /api/hint with Gemini (fetch mocked)', () => {
       n === 1 ? status(400, 'thinking_level is not supported for this model') : ok('Count the squares.'),
     );
     expect(await (await POST(hit())).json()).toEqual({ text: 'Count the squares.', source: 'ai' });
-    expect(calls.map((c) => c.model)).toEqual(['gemini-3.8-flash', 'gemini-3.8-flash']);
+    expect(calls.map((c) => c.model)).toEqual(['gemini-3.5-flash-lite', 'gemini-3.5-flash-lite']);
     expect(calls[0]!.body.generationConfig.thinkingConfig).toBeDefined();
     expect(calls[1]!.body.generationConfig.thinkingConfig).toBeUndefined();
   });
@@ -118,7 +118,7 @@ describe('POST /api/hint with Gemini (fetch mocked)', () => {
   it('all models fail -> built-in hint', async () => {
     const { POST } = await load(() => status(503, 'high demand'));
     expect(await (await POST(hit('sw'))).json()).toEqual(builtin('sw'));
-    expect(calls.map((c) => c.model)).toEqual(['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash-lite']);
+    expect(calls.map((c) => c.model)).toEqual(['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash']);
   });
 
   it('safety stop or off-topic answer -> built-in hint', async () => {
@@ -128,34 +128,34 @@ describe('POST /api/hint with Gemini (fetch mocked)', () => {
     }
   });
 
-  it('timeout -> built-in hint after 3 s, and the running call is aborted', async () => {
+  it('timeout -> built-in hint after the 5.5 s budget, and the running call is aborted', async () => {
     vi.useFakeTimers();
     const { POST } = await load(never);
     const pending = POST(hit());
-    await vi.advanceTimersByTimeAsync(2999);
+    await vi.advanceTimersByTimeAsync(5499);
     expect(signals[0]?.aborted).toBe(false);
     await vi.advanceTimersByTimeAsync(1);
     expect(await (await pending).json()).toEqual(builtin());
     expect(signals[0]?.aborted).toBe(true);
   });
 
-  it('all models and retries share one 3 s budget', async () => {
+  it('all models and retries share one 5.5 s budget', async () => {
     vi.useFakeTimers();
-    // Each model answers after 1.2 s; the third would answer at 3.6 s, past the budget.
+    // Each model answers after 2 s; the third would answer at 6 s, past the 5.5 s budget.
     const { POST } = await load(
       (model) =>
         new Promise<Response>((resolve) =>
-          setTimeout(() => resolve(model === 'gemini-3.5-flash-lite' ? ok('Too late.') : status(503)), 1200),
+          setTimeout(() => resolve(model === 'gemini-3.7-flash' ? ok('Too late.') : status(503)), 2000),
         ),
     );
     const pending = POST(hit());
-    await vi.advanceTimersByTimeAsync(3000);
+    await vi.advanceTimersByTimeAsync(5500);
     expect(await (await pending).json()).toEqual(builtin());
     expect(calls).toHaveLength(3); // the third model was started, then cut off
     expect(signals[2]?.aborted).toBe(true);
   });
 
-  it('caches good answers by activity+code+lang+attempt', async () => {
+  it('caches good answers by activity+code+lang+attempt+context', async () => {
     const { POST } = await load(() => ok('Count the squares.'));
     await POST(hit('en', 1));
     expect(await (await POST(hit('en', 1))).json()).toEqual({ text: 'Count the squares.', source: 'ai' });
@@ -163,6 +163,9 @@ describe('POST /api/hint with Gemini (fetch mocked)', () => {
     await POST(hit('sw', 1));
     await POST(hit('en', 2));
     expect(calls).toHaveLength(3); // other lang / attempt -> new calls
+    await POST(post({ activity: 'program', code: 'HIT_WALL', lang: 'en', attempt: 1, context: 'FORWARD x5' }));
+    await POST(post({ activity: 'program', code: 'HIT_WALL', lang: 'en', attempt: 1, context: 'FORWARD x5' }));
+    expect(calls).toHaveLength(4); // a new context -> new call; the same context again -> cached
   });
 
   it('does not cache built-in fallbacks', async () => {

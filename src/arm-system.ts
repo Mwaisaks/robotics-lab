@@ -3,6 +3,7 @@ import { Part } from './lab-components.js';
 import { ARM_SIGNAL, getArmRig } from './lab.js';
 import { MISTAKE } from './core/events.js';
 import { learning } from './learning.js';
+import { WEB } from './web/state.js';
 import { ARM, ARM_REACH, GRIP_CLOSED, GRIP_OPEN, setForearmOutOfReach } from './robot-arm.js';
 
 /**
@@ -45,6 +46,14 @@ export class ArmSystem extends createSystem({
       rig.root.worldToLocal(this.local);
       tracking = true;
       break;
+    }
+    // Browser mode: the part dragged with mouse/touch counts as held.
+    const dragged = WEB.dragged?.hasComponent(Part) ? WEB.dragged.object3D : undefined;
+    if (!tracking && dragged != null) {
+      dragged.getWorldPosition(this.target);
+      this.local.copy(this.target);
+      rig.root.worldToLocal(this.local);
+      tracking = true;
     }
     if (!tracking) {
       const breathe = Math.sin(this.time * 1.6) * 0.012;
