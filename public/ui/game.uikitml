@@ -209,6 +209,12 @@
     justify-content: center;
   }
 
+  .slot-n {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
   .slot-icon {
     width: 28px;
     height: 28px;
@@ -368,6 +374,7 @@
         <RotateCcw id="slot-0-left" class="slot-icon" style="display: none"></RotateCcw>
         <RotateCw id="slot-0-right" class="slot-icon" style="display: none"></RotateCw>
         <Repeat id="slot-0-rep" class="slot-icon" style="display: none"></Repeat>
+        <div id="slot-0-n" class="slot-n" style="display: none">x2</div>
       </div>
       <div id="slot-1" class="slot">
         <ArrowUp id="slot-1-fwd" class="slot-icon" style="display: none"></ArrowUp>
@@ -375,6 +382,7 @@
         <RotateCcw id="slot-1-left" class="slot-icon" style="display: none"></RotateCcw>
         <RotateCw id="slot-1-right" class="slot-icon" style="display: none"></RotateCw>
         <Repeat id="slot-1-rep" class="slot-icon" style="display: none"></Repeat>
+        <div id="slot-1-n" class="slot-n" style="display: none">x2</div>
       </div>
       <div id="slot-2" class="slot">
         <ArrowUp id="slot-2-fwd" class="slot-icon" style="display: none"></ArrowUp>
@@ -382,6 +390,7 @@
         <RotateCcw id="slot-2-left" class="slot-icon" style="display: none"></RotateCcw>
         <RotateCw id="slot-2-right" class="slot-icon" style="display: none"></RotateCw>
         <Repeat id="slot-2-rep" class="slot-icon" style="display: none"></Repeat>
+        <div id="slot-2-n" class="slot-n" style="display: none">x2</div>
       </div>
       <div id="slot-3" class="slot">
         <ArrowUp id="slot-3-fwd" class="slot-icon" style="display: none"></ArrowUp>
@@ -389,6 +398,7 @@
         <RotateCcw id="slot-3-left" class="slot-icon" style="display: none"></RotateCcw>
         <RotateCw id="slot-3-right" class="slot-icon" style="display: none"></RotateCw>
         <Repeat id="slot-3-rep" class="slot-icon" style="display: none"></Repeat>
+        <div id="slot-3-n" class="slot-n" style="display: none">x2</div>
       </div>
       <div id="slot-4" class="slot">
         <ArrowUp id="slot-4-fwd" class="slot-icon" style="display: none"></ArrowUp>
@@ -396,6 +406,7 @@
         <RotateCcw id="slot-4-left" class="slot-icon" style="display: none"></RotateCcw>
         <RotateCw id="slot-4-right" class="slot-icon" style="display: none"></RotateCw>
         <Repeat id="slot-4-rep" class="slot-icon" style="display: none"></Repeat>
+        <div id="slot-4-n" class="slot-n" style="display: none">x2</div>
       </div>
       <div id="slot-5" class="slot">
         <ArrowUp id="slot-5-fwd" class="slot-icon" style="display: none"></ArrowUp>
@@ -403,6 +414,7 @@
         <RotateCcw id="slot-5-left" class="slot-icon" style="display: none"></RotateCcw>
         <RotateCw id="slot-5-right" class="slot-icon" style="display: none"></RotateCw>
         <Repeat id="slot-5-rep" class="slot-icon" style="display: none"></Repeat>
+        <div id="slot-5-n" class="slot-n" style="display: none">x2</div>
       </div>
       <div id="slot-6" class="slot">
         <ArrowUp id="slot-6-fwd" class="slot-icon" style="display: none"></ArrowUp>
@@ -410,6 +422,7 @@
         <RotateCcw id="slot-6-left" class="slot-icon" style="display: none"></RotateCcw>
         <RotateCw id="slot-6-right" class="slot-icon" style="display: none"></RotateCw>
         <Repeat id="slot-6-rep" class="slot-icon" style="display: none"></Repeat>
+        <div id="slot-6-n" class="slot-n" style="display: none">x2</div>
       </div>
       <div id="slot-7" class="slot">
         <ArrowUp id="slot-7-fwd" class="slot-icon" style="display: none"></ArrowUp>
@@ -417,6 +430,7 @@
         <RotateCcw id="slot-7-left" class="slot-icon" style="display: none"></RotateCcw>
         <RotateCw id="slot-7-right" class="slot-icon" style="display: none"></RotateCw>
         <Repeat id="slot-7-rep" class="slot-icon" style="display: none"></Repeat>
+        <div id="slot-7-n" class="slot-n" style="display: none">x2</div>
       </div>
       </div>
       <div class="row-buttons">
@@ -440,7 +454,7 @@
         </Button>
         <Button id="cmd-rep" class="cmd grow">
           <ButtonIcon><Repeat></Repeat></ButtonIcon>
-          <ButtonLabel class="cmd-label">x2</ButtonLabel>
+          <ButtonLabel id="cmd-rep-label" class="cmd-label">REPEAT</ButtonLabel>
         </Button>
       </div>
       <div class="row-buttons">
