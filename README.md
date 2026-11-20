@@ -58,6 +58,10 @@ Everything after `baseline` is Hackfest work: `git log baseline..main` lists all
 - **Kiswahili** hint text is a draft that still needs a native speaker's review.
 - **Privacy:** students enter a nickname and a class code only; no real names, photos or accounts.
 
+### Known limits
+
+- Headset: in Levels 3 and 4, wire by pointing at a pin and pinching (direct touch on the small pins is not supported yet).
+
 ## Run it locally
 
 Requirements: Node.js 20.19+, 22.12+ or 24+, and npm.
