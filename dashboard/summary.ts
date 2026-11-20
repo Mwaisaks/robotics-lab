@@ -57,7 +57,8 @@ export const ACTIVITY_LABELS: Record<ActivityId, string> = {
   sort: '1 Sort the parts',
   program: '2 Program the robot',
   circuit: '3 Light it up',
-  build: 'Build the robot',
+  build: '3B Build the robot',
+  micro: '4 Microcontroller lab',
   arm: 'Control the arm',
 };
 
