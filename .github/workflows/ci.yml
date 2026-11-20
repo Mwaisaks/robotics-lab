@@ -29,6 +29,9 @@ jobs:
         # Serverless functions have their own tsconfig (api/tsconfig.json).
         run: if [ -f api/tsconfig.json ]; then npx tsc --noEmit -p api; else echo "no api/ yet"; fi
 
+      - name: Typecheck dashboard
+        run: npx tsc --noEmit -p dashboard
+
       - name: Test
         run: npm test
 
