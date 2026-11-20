@@ -25,7 +25,8 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: process.env.NODE_ENV !== 'production',
     target: 'esnext',
-    rollupOptions: { input: './index.html' },
+    // Two pages: the app and the teacher dashboard (served at /dashboard/).
+    rollupOptions: { input: { main: './index.html', dashboard: './dashboard/index.html' } },
   },
   esbuild: { target: 'esnext' },
   // @drawcall/uikitml otherwise pulls a second three/@pmndrs/uikit graph
