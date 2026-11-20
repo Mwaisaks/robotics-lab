@@ -150,14 +150,14 @@ export class CircuitSystem extends createSystem({
       this.wires.pop();
       this.rebuildWires();
       learning.action('circuit', 'undo');
-      this.setMsg('Pinch two dots to add a wire');
+      this.setMsg('Point + pinch the pins');
     });
     this.bind('circ-clear', () => {
       if (this.done) return;
       this.wires.length = 0;
       this.select(-1);
       this.rebuildWires();
-      this.setMsg('Pinch two dots to add a wire');
+      this.setMsg('Point + pinch the pins');
       learning.action('circuit', 'clear');
     });
     this.bind('circ-power', () => this.power());
@@ -185,7 +185,7 @@ export class CircuitSystem extends createSystem({
     this.glow = 0;
     this.applyLed();
     this.rebuildWires();
-    this.setMsg('Pinch two dots to add a wire');
+    this.setMsg('Point + pinch the pins');
     this.ui['circ-edit']?.setProperties({ display: 'flex' });
     this.ui['circ-done']?.setProperties({ display: 'none' });
     learning.start('circuit', 0, modeOf(this.world));
@@ -362,12 +362,12 @@ export class CircuitSystem extends createSystem({
     if (this.selected < 0) {
       this.select(id);
       playSfx('grab');
-      this.setMsg('Now pinch another dot');
+      this.setMsg('Point + pinch another pin');
       return;
     }
     if (this.selected === id) {
       this.select(-1);
-      this.setMsg('Pinch two dots to add a wire');
+      this.setMsg('Point + pinch the pins');
       return;
     }
     const a = Math.min(this.selected, id);

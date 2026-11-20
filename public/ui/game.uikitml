@@ -581,7 +581,7 @@
       <div class="tut-sub">A simplified circuit model</div>
       <div class="tut-step-row">
         <Pointer class="step-icon"></Pointer>
-        <div class="step-text">Pinch two dots: a wire</div>
+        <div class="step-text">Point + pinch the pins</div>
       </div>
       <div class="tut-step-row">
         <Lightbulb class="step-icon"></Lightbulb>
@@ -591,7 +591,7 @@
         <Zap class="step-icon"></Zap>
         <div class="step-text">Press POWER to test</div>
       </div>
-      <div id="circ-msg" class="prog-instr">Pinch two dots to add a wire</div>
+      <div id="circ-msg" class="prog-instr">Point + pinch the pins</div>
       <div class="row-buttons">
         <Button id="circ-undo" class="cmd grow" variant="secondary">
           <ButtonIcon><Undo2></Undo2></ButtonIcon>
@@ -666,7 +666,7 @@
     <div id="micro-wire" class="prog-col">
       <div class="tut-step-row">
         <Pointer class="step-icon"></Pointer>
-        <div class="step-text">Pinch two dots: a wire</div>
+        <div class="step-text">Point + pinch the pins</div>
       </div>
       <div class="tut-step-row">
         <Lightbulb class="step-icon"></Lightbulb>
