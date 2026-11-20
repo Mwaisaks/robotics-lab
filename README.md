@@ -26,7 +26,7 @@ Everything after `baseline` is Hackfest work: `git log baseline..main` lists all
 - Bright procedural 3D lab room behind the table in browser mode (no textures, a few draw calls). (#38)
 
 **Robo, the AI tutor**
-- Built-in hints for every mistake code in English and Kiswahili, shown instantly and offline. (#6, #24, #30, #33)
+- 23 built-in hints per language (English and Kiswahili), one for every mistake code, shown instantly and offline. (#6, #24, #30, #33, #34)
 - AI hints from `/api/hint` (Gemini API, server-side key): the built-in hint shows at once and the AI hint replaces it if it arrives within 6 s. Student data is never sent to the model. (#6, #7, #37)
 - Hint box in the browser and an in-world hint panel in the headset. (#7, #26)
 
@@ -54,7 +54,7 @@ Everything after `baseline` is Hackfest work: `git log baseline..main` lists all
 | Advanced | Arm control, inverse kinematics, PID | | Coming soon (shown in the menu) |
 
 - **Headset mode** (Meta Quest, hands only, passthrough) and **browser mode** (mouse or touch) run the same code and the same rules.
-- **Robo** works offline with built-in hints; AI hints need a connection.
+- **Robo** works offline with its 23 built-in hints per language; AI hints need a connection.
 - **Kiswahili** hint text is a draft that still needs a native speaker's review.
 - **Privacy:** students enter a nickname and a class code only; no real names, photos or accounts.
 
@@ -111,9 +111,9 @@ The Gemini and Supabase calls use plain `fetch` (no extra client libraries).
 
 | Person | Role |
 |---|---|
-| **Phenny Mwaisaka** | Team lead, integrator and QA: repo, CI, Vercel, learning events, browser mode, start screen and class code, headset hint panel, menu, lab room, merges and releases |
-| **Joshua Mumo** | Robotics and content lead, Quest tester: activity specs, mistake codes and hint text (English and Kiswahili), Level 2 upgrade, Level 4 Microcontroller lab, Quest tests |
-| **Rebecca Okoko** | AI and data lead: Robo tutor (built-in + AI hints), `/api/hint`, progress sync and Supabase schema, teacher dashboard, demo class |
+| **Phenny Mwaisaka** | Team leader, software engineer, QA |
+| **Joshua Mumo** | Robotics engineer, content lead, Quest tester |
+| **Rebecca Okoko** | ML engineer, AI tutor and data |
 
 ## Repository map
 
