@@ -76,7 +76,7 @@ const asCode = (code: MicroCode) => code as unknown as MistakeCode;
 /** TODO(i18n): move to src/shell/i18n.ts (en + sw). Max 5 words each. */
 const TEXT = {
   wire: 'Wire the LED and sensor',
-  pickAnother: 'Now pinch another dot',
+  pickAnother: 'Point + pinch another pin',
   added: 'Wire added',
   already: 'Already wired',
   tooMany: 'Too many wires. Try UNDO.',
