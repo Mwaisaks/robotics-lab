@@ -4,7 +4,7 @@
  * Pure TypeScript: no three.js, IWSDK, DOM or network imports.
  */
 
-export type ActivityId = 'sort' | 'program' | 'circuit' | 'build' | 'arm';
+export type ActivityId = 'sort' | 'program' | 'circuit' | 'build' | 'micro' | 'arm';
 export type Mode = 'xr' | 'web';
 export type Stars = 0 | 1 | 2 | 3;
 
@@ -50,6 +50,12 @@ export const MISTAKE = {
   SWITCH_OFF: 'SWITCH_OFF',
   // Level 3 Part 2, Build the robot
   WRONG_SLOT: 'WRONG_SLOT',
+  // Level 4, Microcontroller lab (docs/activities/microcontroller.md)
+  LED_WRONG_PIN: 'LED_WRONG_PIN',
+  NO_GND: 'NO_GND',
+  SENSOR_MISWIRED: 'SENSOR_MISWIRED',
+  PROGRAM_INCOMPLETE: 'PROGRAM_INCOMPLETE',
+  LOGIC_REVERSED: 'LOGIC_REVERSED',
   // P2, Control the arm
   TARGET_UNREACHABLE: 'TARGET_UNREACHABLE',
   JOINT_LIMIT: 'JOINT_LIMIT',
@@ -76,6 +82,15 @@ export const MISTAKE_CODES = {
     MISTAKE.SWITCH_OFF,
   ],
   build: [MISTAKE.WRONG_SLOT],
+  micro: [
+    MISTAKE.LED_WRONG_PIN,
+    MISTAKE.LED_REVERSED,
+    MISTAKE.NO_GND,
+    MISTAKE.SENSOR_MISWIRED,
+    MISTAKE.SHORT_CIRCUIT,
+    MISTAKE.PROGRAM_INCOMPLETE,
+    MISTAKE.LOGIC_REVERSED,
+  ],
   arm: [MISTAKE.TARGET_UNREACHABLE, MISTAKE.JOINT_LIMIT],
 } as const satisfies Record<ActivityId, readonly string[]>;
 

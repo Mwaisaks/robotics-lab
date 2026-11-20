@@ -18,6 +18,7 @@ import { PartRespawnSystem } from './part-respawn.js';
 import { ProgramSystem } from './program.js';
 import { TablePlacementSystem } from './table-placement.js';
 import { logEventsIfDebug, modeOf } from './learning.js';
+import { MicroSystem } from './micro.js';
 import { LabEnvironmentSystem } from './shared3d/environment/lab-environment-system.js';
 import { HINT_PANEL, HintPanelSystem } from './shell/hint-panel.js';
 import { getLang } from './shell/i18n.js';
@@ -58,6 +59,7 @@ World.create(
   world.registerSystem(ProgramSystem);
   world.registerSystem(CircuitSystem);
   world.registerSystem(BuildSystem);
+  world.registerSystem(MicroSystem);
   world.registerSystem(BrowserModeSystem);
   world.registerSystem(HintPanelSystem);
   world.registerSystem(LabEnvironmentSystem);

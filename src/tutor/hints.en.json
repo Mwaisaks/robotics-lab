@@ -20,5 +20,14 @@
     "LED_NOT_IN_LOOP": "The LED isn't in the loop yet. Wire it between the resistor and the battery.",
     "SWITCH_NOT_IN_LOOP": "Add the switch to the loop and turn it on to let the current flow.",
     "SWITCH_OFF": "Add the switch to the loop and turn it on to let the current flow."
+  },
+  "micro": {
+    "LED_WRONG_PIN": "The program switches pin D13. Wire the LED's long leg (+) to D13.",
+    "LED_REVERSED": "LEDs only work one way. The long leg (+) goes to D13 and the short leg to GND.",
+    "NO_GND": "Current needs a way back to the board. Connect the part's GND or short leg to a GND pin.",
+    "SENSOR_MISWIRED": "Each sensor pin has one job. VCC goes to 5V, TRIG to D7 and ECHO to D8.",
+    "SHORT_CIRCUIT": "That's a short circuit: 5V joined straight to GND. Power must go through a part first.",
+    "PROGRAM_INCOMPLETE": "A decision needs both branches. Use IF NEAR, an action, ELSE, then an action.",
+    "LOGIC_REVERSED": "Check what each branch does. LED ON belongs under IF NEAR, LED OFF under ELSE."
   }
 }
