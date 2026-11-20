@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Class Progress</title>
+    <style>
+      :root {
+        --bg: #f6f4ee;
+        --panel: #ffffff;
+        --text: #1a1a1a;
+        --muted: #5b5b5b;
+        --line: #dcd8cc;
+        --accent: #b36b00;
+        --accent-text: #ffffff;
+        --star: #c98a00;
+        --error: #a32020;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #15171a;
+          --panel: #1f2226;
+          --text: #f2f2f2;
+          --muted: #b0b0b0;
+          --line: #3a3f45;
+          --accent: #f2a900;
+          --accent-text: #1a1a1a;
+          --star: #f2c200;
+          --error: #ff8a8a;
+        }
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 400 clamp(17px, 0.6vw + 15px, 20px)/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
+      h1 { font-size: clamp(28px, 2vw + 20px, 40px); line-height: 1.15; margin: 0 0 4px; }
+      h2 { font-size: clamp(22px, 1vw + 18px, 28px); margin: 32px 0 12px; }
+      .sub { color: var(--muted); margin: 0 0 24px; }
+      form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+      label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; flex: 1 1 220px; }
+      input {
+        font: 700 28px/1.2 inherit;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 14px 16px;
+        min-height: 60px;
+        border: 3px solid var(--line);
+        border-radius: 12px;
+        background: var(--panel);
+        color: var(--text);
+        width: 100%;
+      }
+      input:focus { outline: none; border-color: var(--accent); }
+      button {
+        font: 800 24px/1 inherit;
+        min-height: 60px;
+        min-width: 140px;
+        padding: 0 28px;
+        border: none;
+        border-radius: 12px;
+        background: var(--accent);
+        color: var(--accent-text);
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+      button:disabled { opacity: 0.6; cursor: wait; }
+      button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+      .status { margin: 16px 0 0; min-height: 1.5em; color: var(--muted); }
+      .status.error { color: var(--error); font-weight: 700; }
+      .empty {
+        margin-top: 24px;
+        padding: 32px 20px;
+        border: 3px dashed var(--line);
+        border-radius: 16px;
+        text-align: center;
+        font-size: 1.2em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+      table { border-collapse: collapse; width: 100%; min-width: 560px; }
+      th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+      thead th { font-size: 0.85em; color: var(--muted); position: sticky; top: 0; background: var(--panel); }
+      tbody tr:last-child td { border-bottom: none; }
+      td.name { font-weight: 800; }
+      .stars { color: var(--star); font-size: 1.25em; letter-spacing: 0.05em; white-space: nowrap; }
+      .time { display: block; color: var(--muted); font-variant-numeric: tabular-nums; }
+      .none { color: var(--muted); }
+      ol.mistakes { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+      ol.mistakes li { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+      .code { font-weight: 800; font-size: 1.05em; }
+      .count { color: var(--muted); }
+      .meaning { margin: 6px 0 0; }
+      .note { color: var(--muted); font-size: 0.85em; margin-top: 32px; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Class Progress</h1>
+      <p class="sub">Robotics Lab · teacher view</p>
+
+      <form id="form" autocomplete="off">
+        <label>
+          Class code
+          <input id="code" name="code" inputmode="text" maxlength="8" placeholder="DEMO1" autocapitalize="characters" spellcheck="false" required />
+        </label>
+        <button id="show" type="submit">Show</button>
+      </form>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+
+      <div id="empty" class="empty" hidden>No results yet for this class</div>
+
+      <section id="results" hidden>
+        <h2 id="students-title">Students</h2>
+        <div class="table-wrap">
+          <table id="table">
+            <thead><tr id="head"></tr></thead>
+            <tbody id="body"></tbody>
+          </table>
+        </div>
+
+        <h2>Top 3 mistakes in this class</h2>
+        <ol id="mistakes" class="mistakes"></ol>
+        <p id="no-mistakes" class="none" hidden>No mistakes recorded yet.</p>
+
+        <p class="note">Best stars and fastest time per level. Times are Kenya time (EAT). Nicknames only; no personal data is stored.</p>
+      </section>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
