@@ -271,6 +271,10 @@
     font-weight: 700;
   }
 
+  .micro-label {
+    font-size: 18px;
+  }
+
   .button-tiny {
     height: 48px;
   }
@@ -696,18 +700,18 @@
       </div>
       <div class="row-buttons">
         <Button id="micro-b-if_near" class="cmd grow">
-          <ButtonLabel class="cmd-label">IF NEAR</ButtonLabel>
+          <ButtonLabel class="cmd-label micro-label">IF NEAR</ButtonLabel>
         </Button>
         <Button id="micro-b-led_on" class="cmd grow">
-          <ButtonLabel class="cmd-label">LED ON</ButtonLabel>
+          <ButtonLabel class="cmd-label micro-label">LED ON</ButtonLabel>
         </Button>
       </div>
       <div class="row-buttons">
         <Button id="micro-b-else" class="cmd grow">
-          <ButtonLabel class="cmd-label">ELSE</ButtonLabel>
+          <ButtonLabel class="cmd-label micro-label">ELSE</ButtonLabel>
         </Button>
         <Button id="micro-b-led_off" class="cmd grow">
-          <ButtonLabel class="cmd-label">LED OFF</ButtonLabel>
+          <ButtonLabel class="cmd-label micro-label">LED OFF</ButtonLabel>
         </Button>
       </div>
       <div class="row-buttons">
@@ -738,6 +742,8 @@
         <Button id="micro-d-2" class="dist-button grow" variant="secondary">
           <ButtonLabel id="micro-d-2-l" class="cmd-label">15</ButtonLabel>
         </Button>
+      </div>
+      <div class="row-buttons">
         <Button id="micro-d-3" class="dist-button grow" variant="secondary">
           <ButtonLabel id="micro-d-3-l" class="cmd-label">25</ButtonLabel>
         </Button>
